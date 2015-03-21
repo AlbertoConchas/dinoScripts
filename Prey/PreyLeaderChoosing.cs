@@ -6,13 +6,11 @@ public class PreyLeaderChoosing : MonoBehaviour {
 	public float leadership;
 	private bool requestResponded;
 	private GameObject tempLeader;
-	private int comRange;
 
 	
 	// Llamada a la votacion
 	public void choose () {
 		leadership = GetComponent<Prey> ().getLeadershipStat();
-		comRange = GetComponent<Prey> ().comRange;
 
 		StartCoroutine(startElection());
 		StartCoroutine(endElection ());
@@ -23,28 +21,16 @@ public class PreyLeaderChoosing : MonoBehaviour {
 	 * Les solicita a los que tienen mejor capacidad de liderazgo que si pueden ser lideres
 	 **/
 	void sendElectionMessage(){
-		
-		Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange);
-		//Por cada objeto encontrado
-		for (int i = 0; i < hitColliders.Length; i++) {
-			
-			//Si es un velocirraptor
-			if(hitColliders[i].GetComponent<Prey>() != null){
-				
-				
-				//Que no soy yo
-				if(hitColliders[i].gameObject.GetInstanceID() != gameObject.GetInstanceID()){
-					
-					//Si es mejor lider que yo
-					if( leadership < hitColliders[i].gameObject.GetComponent<PreyLeaderChoosing>().leadership ){
-						
-						//Pidele que sea lider
-						hitColliders[i].SendMessage("leadershipRequest", gameObject);
-						
-					}
-				}
-			}
-		}
+        //por cada integrante en la manada (distinto de mi)
+        foreach (GameObject prey in gameObject.GetComponent<Prey>().getHerd())
+        {
+            //Si es mejor lider que yo
+            if (leadership < prey.GetComponent<PreyLeaderChoosing>().leadership)
+            {
+                //Pidele que sea lider
+                prey.SendMessage("leadershipRequest", gameObject);
+            }
+        }
 	}
 	
 	
@@ -115,22 +101,12 @@ public class PreyLeaderChoosing : MonoBehaviour {
 		
 		if (tempLeader == null || tempLeader.GetComponent<PreyLeaderChoosing> ().leadership < leader.GetComponent<PreyLeaderChoosing> ().leadership) {
 			tempLeader = leader;
-			
-			Collider[] hitColliders = Physics.OverlapSphere (transform.position, comRange);
-			//Por cada objeto encontrado
-			for (int i = 0; i < hitColliders.Length; i++) {
-				
-				//Si es un velocirraptor
-				if (hitColliders [i].GetComponent<Prey> () != null) {
-					
-					//Que no soy yo
-					if (hitColliders [i].gameObject.GetInstanceID () != gameObject.GetInstanceID ())
-						
-						//Enviale la eleccion de lider
-						hitColliders [i].SendMessage ("BroadcastLeadership", tempLeader);
-					
-				}
-			}
+            //por cada integrante en la manada (distinto de mi)
+            foreach (GameObject prey in gameObject.GetComponent<Prey>().getHerd())
+            {
+                //Enviale la eleccion de lider
+                prey.SendMessage("BroadcastLeadership", tempLeader);
+            }
 		}
 	}
 	

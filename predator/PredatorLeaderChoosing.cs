@@ -6,13 +6,11 @@ public class PredatorLeaderChoosing : MonoBehaviour {
 	public float leadership;
 	private bool requestResponded;
 	private GameObject tempLeader;
-	private int comRange;
 
 	
 	// Llamada a la votacion
 	public void choose () {
 		leadership = GetComponent<Predator> ().getLeadershipStat();
-		comRange = GetComponent<Predator> ().comRange;
 
 		StartCoroutine(startElection());
 		StartCoroutine(endElection ());
@@ -23,28 +21,16 @@ public class PredatorLeaderChoosing : MonoBehaviour {
 	 * Les solicita a los que tienen mejor capacidad de liderazgo que si pueden ser lideres
 	 **/
 	void sendElectionMessage(){
-		
-		Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange);
-		//Por cada objeto encontrado
-		for (int i = 0; i < hitColliders.Length; i++) {
-			
-			//Si es un velocirraptor
-			if(hitColliders[i].GetComponent<Predator>() != null){
-				
-				
-				//Que no soy yo
-				if(hitColliders[i].gameObject.GetInstanceID() != gameObject.GetInstanceID()){
-					
-					//Si es mejor lider que yo
-					if( leadership < hitColliders[i].gameObject.GetComponent<PredatorLeaderChoosing>().leadership ){
-						
-						//Pidele que sea lider
-						hitColliders[i].SendMessage("leadershipRequest", gameObject);
-						
-					}
-				}
-			}
-		}
+
+        //por cada integrante en la manada (distinto de mi)
+        foreach (GameObject veloc in gameObject.GetComponent<Predator>().getHerd())
+        {
+            //Si es mejor lider que yo
+            if (leadership < veloc.GetComponent<PredatorLeaderChoosing>().leadership) {
+                //Pidele que sea lider
+                veloc.SendMessage("leadershipRequest", gameObject);
+            }
+        }
 	}
 	
 	
@@ -112,25 +98,14 @@ public class PredatorLeaderChoosing : MonoBehaviour {
 		if(tempLeader!=null && tempLeader.GetInstanceID() == leader.GetInstanceID()){
 			return;
 		}
-		
 		if (tempLeader == null || tempLeader.GetComponent<PredatorLeaderChoosing> ().leadership < leader.GetComponent<PredatorLeaderChoosing> ().leadership) {
 			tempLeader = leader;
-			
-			Collider[] hitColliders = Physics.OverlapSphere (transform.position, comRange);
-			//Por cada objeto encontrado
-			for (int i = 0; i < hitColliders.Length; i++) {
-				
-				//Si es un velocirraptor
-				if (hitColliders [i].GetComponent<Predator> () != null) {
-					
-					//Que no soy yo
-					if (hitColliders [i].gameObject.GetInstanceID () != gameObject.GetInstanceID ())
-						
-						//Enviale la eleccion de lider
-						hitColliders [i].SendMessage ("BroadcastLeadership", tempLeader);
-					
-				}
-			}
+            //por cada integrante en la manada (distinto de mi)
+            foreach (GameObject veloc in gameObject.GetComponent<Predator>().getHerd())
+            {
+                //Enviale la eleccion de lider
+                veloc.SendMessage("BroadcastLeadership", tempLeader);
+            }
 		}
 	}
 	

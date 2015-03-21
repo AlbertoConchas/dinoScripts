@@ -1,5 +1,6 @@
-﻿using UnityEngine;	
+﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Prey : MonoBehaviour 
 {
@@ -12,10 +13,11 @@ public class Prey : MonoBehaviour
 	public float lifetime	= 10000f;		//Tiempo de vida
 	public float attack		= 10f;			//Daño que realiza la entidad
 	public float flesh 		= 500f;
+    public bool inAttack = false;
 	//public int state;
     public Prey.States state;
-	
-	private bool isNeededRun = false;
+    private List<GameObject> herd = new List<GameObject>();
+	public bool isNeededRun = false;
 	private NavMeshAgent nav;
 	private GameObject leader;
 	public GameObject actualFood;
@@ -30,7 +32,6 @@ public class Prey : MonoBehaviour
 	void Start () {
 		//state = States.ChoosingLeader;
         state = States.ChoosingLeader;
-
 		//Fija los parametros iniciales en torno a la escala
 		comRange = (int) ( comRange * ((float)transform.localScale.x/0.3));
 		this.stoppingDistance = travelStopDistance ();
@@ -76,8 +77,11 @@ public class Prey : MonoBehaviour
 				}
 			}
 
-		}else if ( leader == null && state != States.ChoosingLeader ){
-
+        }
+            // si el lider ya no existe o esta muerto y ademas no se esta seleccionando lider
+        else if ((leader == null || leader.GetComponent<Prey>().state== Prey.States.Die) && state != States.ChoosingLeader)
+        {
+            updateHerd(); 
 			if (GetComponent<PreyLeaderChoosing> () == null)
 				setLeader (gameObject);
 			else {
@@ -630,8 +634,45 @@ public class Prey : MonoBehaviour
 		}
 		return ret;
 	}
-	
-	
+
+    //actualiza la manada cuando alguien muere (en especial el lider)
+    private void updateHerd(){
+        List<GameObject> newHerd = new List<GameObject>();
+
+        foreach (GameObject prey in herd)
+	    {
+            if (prey != null && prey.GetComponent<Prey>().state != Prey.States.Die)
+            {
+                newHerd.Add(prey);
+            }
+	    }
+        herd=newHerd;
+    }
+    /*
+  * se busca quienes son los integrantes de la manada.
+  */
+    public List<GameObject> getHerd()
+    {
+        if (herd.Count == 0)
+        {
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange);
+            for (int i = 0; i < hitColliders.Length; i++)
+            {
+
+                //Si es una presa
+                if (hitColliders[i].GetComponent<Prey>() != null)
+                {
+                    //Que no soy yo
+                    if (hitColliders[i].gameObject.GetInstanceID() != gameObject.GetInstanceID())
+                    {
+                        herd.Add(hitColliders[i].gameObject);
+                    }
+                }
+            }
+        }
+
+        return herd;
+    }
 	/*
 	 * Retorna la mejor presa posible
 	 */

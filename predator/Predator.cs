@@ -1,5 +1,6 @@
-﻿using UnityEngine;	
+﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Predator : MonoBehaviour {
 	//public Transform m_Prey;
@@ -12,10 +13,10 @@ public class Predator : MonoBehaviour {
 	public float attack		= 10f;			//Daño que realiza la entidad
 	public float flesh 		= 200f;
     public States state;
-    public static GameObject[] herd;
 	private bool isNeededRun = false;
 	private NavMeshAgent nav;
-	private GameObject leader;
+    private GameObject leader;
+    private List<GameObject> herd = new List<GameObject>();
 	public GameObject actualFood;
 	private float stoppingDistance;
 	
@@ -26,8 +27,10 @@ public class Predator : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
+
 		state = States.ChoosingLeader;
-		
+       // getHerd();
+
 		//Fija los parametros iniciales en torno a la escala
 		comRange = (int) ( comRange * ((float)transform.localScale.x/0.3));
 		this.stoppingDistance = travelStopDistance ();
@@ -54,8 +57,9 @@ public class Predator : MonoBehaviour {
 			return;
 
 
-		if (leader == null && state != States.ChoosingLeader) {
-	
+        if ((leader == null || leader.GetComponent<Predator>().state == Predator.States.Die) && state != States.ChoosingLeader)
+        {
+            updateHerd();
 			if (GetComponent<PreyLeaderChoosing> () == null)
 					setLeader (gameObject);
 			else {
@@ -480,6 +484,7 @@ public class Predator : MonoBehaviour {
 	//Mueve las estadisticas del enemigo y del agente
 	void eatEnemy(){
 		actualFood.GetComponent<Prey> ().flesh -= ((float)this.attack / (1f / Time.deltaTime))*0.6f;
+        actualFood.GetComponent<Prey>().isNeededRun = true;
 		if ( this.stamina < 100f )
 			this.stamina += ((float)this.attack / (1f / Time.deltaTime));
 		else 
@@ -545,8 +550,7 @@ public class Predator : MonoBehaviour {
 		}
 		return ret;
 	}
-	
-	
+
 	/**
 	 *	Obtiene los objetos "COMIDA", cercanos a la posicion del objeto
 	 */
@@ -586,8 +590,47 @@ public class Predator : MonoBehaviour {
 		//return g [Random.Range (0, g.Length - 1)];
 		return getNeardest (g);
 	}
-	
-	
+
+
+    //actualiza la manada cuando alguien muere (en especial el lider)
+    private void updateHerd()
+    {
+        List<GameObject> newHerd = new List<GameObject>();
+
+        foreach (GameObject predator in herd)
+        {
+            if (predator != null && predator.GetComponent<Predator>().state != Predator.States.Die)
+            {
+                newHerd.Add(predator);
+            }
+        }
+        herd = newHerd;
+    }
+
+   /*
+    * se busca quienes son los integrantes de la manada.
+    */
+   public List<GameObject> getHerd() {
+        if (herd.Count==0)
+        {
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange);
+            for (int i = 0; i < hitColliders.Length; i++)
+            {
+
+                //Si es un velocirraptor
+                if (hitColliders[i].GetComponent<Predator>() != null)
+                {
+                    //Que no soy yo
+                    if (hitColliders[i].gameObject.GetInstanceID() != gameObject.GetInstanceID())
+                    {
+                        herd.Add(hitColliders[i].gameObject);
+                    }
+                }
+            }
+        }
+
+        return herd;
+    }
 	/*
 	*	Llama al modulo de logica difusa para encontrar el area mas conveniente para encontrr comida
 	*/
