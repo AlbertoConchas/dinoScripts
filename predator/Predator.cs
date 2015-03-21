@@ -12,7 +12,7 @@ public class Predator : Dinosaur {
 	void Start () {
         
 		state = States.ChoosingLeader;
-        updateHerd();
+        updateHerd<Predator>();
 
 		//Fija los parametros iniciales en torno a la escala
 		comRange = (int) ( comRange * ((float)transform.localScale.x/0.3));
@@ -47,7 +47,7 @@ public class Predator : Dinosaur {
 
         if ((leader == null || leader.GetComponent<Predator>().state == Predator.States.Die) && state != States.ChoosingLeader)
         {
-            updateHerd();
+            updateHerd<Predator>();
 
             //Si no cuenta con eleccion de lider, el es el lider
             if (GetComponent<LeaderChoosing>() == null)

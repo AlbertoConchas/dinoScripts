@@ -15,9 +15,10 @@ public class Prey : Dinosaur
 	void Start () {
 
         flesh = 500f;
-        updateHerd();
 
         state = States.ChoosingLeader;
+        updateHerd<Prey>();
+
 		//Fija los parametros iniciales en torno a la escala
 		comRange = (int) ( comRange * ((float)transform.localScale.x/0.3));
 		this.stoppingDistance = travelStopDistance ();
@@ -66,14 +67,18 @@ public class Prey : Dinosaur
 
         }
             // si el lider ya no existe o esta muerto y ademas no se esta seleccionando lider
-        else if ((leader == null || leader.GetComponent<Prey>().state== Prey.States.Die) && state != States.ChoosingLeader)
+        else if ((leader == null || leader.GetComponent<Prey>().state==States.Die) && state != States.ChoosingLeader)
         {
-            updateHerd();
+            updateHerd<Prey>();
+
+            //Si no cuenta con eleccion de lider, el es el lider
             if (GetComponent<LeaderChoosing>() == null)
-				setLeader (gameObject);
-			else {
+                setLeader(gameObject);
+            else
+            {
                 GetComponent<LeaderChoosing>().choose();
-			}
+            }
+		
 
 		}else if (state != States.ChoosingLeader) {
 
