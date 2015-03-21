@@ -2,35 +2,21 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Prey : MonoBehaviour 
+public class Prey : Dinosaur 
 {
-	//public Transform m_Prey;
-	public float hp 		= 100f;			//Salud de la entidad
-	public int np 			= 10;			//Nutricion aportada a quien se alimente de la entidad
-	public int speed 		= 2;			//Velocidad de la entidad
-	public int comRange		= 10;			//Rango de comunicacion
-	public double stamina	= 100f;			//Resistencia (nesesaria para correr etc....)
-	public float lifetime	= 10000f;		//Tiempo de vida
-	public float attack		= 10f;			//Daño que realiza la entidad
-	public float flesh 		= 500f;
-    public bool inAttack = false;
-	//public int state;
-    public Prey.States state;
-    private List<GameObject> herd = new List<GameObject>();
 	public bool isNeededRun = false;
-	private NavMeshAgent nav;
-	private GameObject leader;
 	public GameObject actualFood;
-	private float stoppingDistance;
 
 	//Enum Para los estados del seguidor
-	public enum States { ChoosingLeader, Searching, Following , Moving, Hunting, Eating, Reproduce, Hiding, Waiting, Reagruping, Die };
 
 
 
 	// Use this for initialization
 	void Start () {
-		//state = States.ChoosingLeader;
+
+        flesh = 500f;
+        updateHerd();
+
         state = States.ChoosingLeader;
 		//Fija los parametros iniciales en torno a la escala
 		comRange = (int) ( comRange * ((float)transform.localScale.x/0.3));
@@ -43,12 +29,13 @@ public class Prey : MonoBehaviour
 		if(isNeededRun)
 			nav.speed = (float)speed*3;
 
-		//Si no cuenta con eleccion de lider, el es el lider
-		if (GetComponent<PreyLeaderChoosing> () == null)
-			setLeader (gameObject);
-		else {
-			GetComponent<PreyLeaderChoosing> ().choose ();
-		}
+        //Si no cuenta con eleccion de lider, el es el lider
+        if (GetComponent<LeaderChoosing>() == null)
+            setLeader(gameObject);
+        else
+        {
+            GetComponent<LeaderChoosing>().choose();
+        }
 	}
 
 
@@ -81,11 +68,11 @@ public class Prey : MonoBehaviour
             // si el lider ya no existe o esta muerto y ademas no se esta seleccionando lider
         else if ((leader == null || leader.GetComponent<Prey>().state== Prey.States.Die) && state != States.ChoosingLeader)
         {
-            updateHerd(); 
-			if (GetComponent<PreyLeaderChoosing> () == null)
+            updateHerd();
+            if (GetComponent<LeaderChoosing>() == null)
 				setLeader (gameObject);
 			else {
-				GetComponent<PreyLeaderChoosing> ().choose ();
+                GetComponent<LeaderChoosing>().choose();
 			}
 
 		}else if (state != States.ChoosingLeader) {
@@ -411,103 +398,6 @@ public class Prey : MonoBehaviour
 
 	}
 
-	
-	/*
-	 * Funcion para enviar a todos los objetos cercanos
-	 * string Messaage: Funcion que sera ejecutada en los objetos encontrados
-	 * object obj: Parametros para enviar a esa funcion
-	 */
-	void BroadCast(string message, object obj){
-		Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange);
-		for (int i = 0; i < hitColliders.Length; i++) {
-			if( !isMe( hitColliders[i].gameObject ) ){ //No me lo envio a mi
-				if (hitColliders [i].GetComponent<Prey> () != null) {
-					hitColliders[i].SendMessage(message, (GameObject) obj);	
-				}
-			}
-		}
-	}
-
-
-
-	/*
-	 * getLeadershipStat
-	 * Retorna la capacidad de liderazgo de la unidad
-	 */
-	public float getLeadershipStat(){
-		return 
-			(this.hp / 100) + 
-				(this.speed / 3) + 
-				((float)this.stamina / 100) + 
-				((this.lifetime * 2) / 10000);
-	}
-
-	/**
-	 *	Fijar el objeto lider
-	 */
-	public void setLeader(GameObject l ){
-		leader = l;
-		nav.avoidancePriority = 1;
-		state = States.Searching;
-	}
-
-
-	//Retorna si el gameobject enviado es igual a la entidad actual
-	bool isMe(GameObject g){
-		if ( g.GetInstanceID() == gameObject.GetInstanceID() )
-			return true;
-		return false;
-	}
-	
-	//Retorna si el gameobject enviado es igual al lider de la unidad actual
-	bool isMyLeader(GameObject l){
-		if ( l.GetInstanceID () == leader.GetInstanceID () )
-			return true;
-		return false;
-	}
-
-
-
-
-	/**
-	 *	Regresa la distancia desde la pocion actual a el destino deseado
-	 */
-	float distanceFromDestination(){
-		return Vector3.Distance(transform.position, nav.destination);
-	}
-
-	
-	/*
-	 *	Regresa una pocicion aleatoria alrededor de la pocicion dada
-	 */
-	Vector3 Dispersal(Vector3 pos){
-		pos.x = pos.x + (((float)Random.Range (-50, 50) / 100) * this.comRange);
-		pos.z = pos.z + (((float)Random.Range (-50, 50) / 100) * this.comRange);
-		return pos;
-	}
-
-
-	float travelStopDistance(){
-		return comRange * ((float)Random.Range (30, 50) / 100);
-	}
-
-
-	bool isOnRangeToStop(){
-		return isOnRangeToStop (1f);
-	}
-	
-	bool isOnRangeToStop(float factor){
-		return ( distanceFromDestination() < this.stoppingDistance*factor );
-	}
-
-	/*
-	 *	Funcion que detiene al nav Agent
-	 */
-	private void stop(){
-		nav.destination = transform.position;
-	}
-
-
 	/**
 	 *	Funciones Biologicas de consumir energia
 	 */
@@ -546,27 +436,6 @@ public class Prey : MonoBehaviour
 		else 
 			this.hp += ((float)this.attack / (1f / Time.deltaTime))*0.5f;
 	}
-
-	private void die(){
-		state = States.Die;
-		this.GetComponent<DinasorsAnimationCorrector>().die();
-		gameObject.GetComponent<PreyNeuronalChoose> ().enabled = false;
-		if (isMyLeader (gameObject)) 
-        {
-			LeaderSaysUnsetLeader (gameObject);
-            Transform t = gameObject.transform.Find("leaderLigth");
-            if (t != null)
-            {
-                Destroy(t.gameObject);
-            }
-            else {
-                Debug.LogWarning("leaderLight warning");
-            }
-		}
-	}
-
-
-
 
 	/**
 	 * Distancia Optima para atacar al enemigo actual
@@ -635,44 +504,6 @@ public class Prey : MonoBehaviour
 		return ret;
 	}
 
-    //actualiza la manada cuando alguien muere (en especial el lider)
-    private void updateHerd(){
-        List<GameObject> newHerd = new List<GameObject>();
-
-        foreach (GameObject prey in herd)
-	    {
-            if (prey != null && prey.GetComponent<Prey>().state != Prey.States.Die)
-            {
-                newHerd.Add(prey);
-            }
-	    }
-        herd=newHerd;
-    }
-    /*
-  * se busca quienes son los integrantes de la manada.
-  */
-    public List<GameObject> getHerd()
-    {
-        if (herd.Count == 0)
-        {
-            Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange);
-            for (int i = 0; i < hitColliders.Length; i++)
-            {
-
-                //Si es una presa
-                if (hitColliders[i].GetComponent<Prey>() != null)
-                {
-                    //Que no soy yo
-                    if (hitColliders[i].gameObject.GetInstanceID() != gameObject.GetInstanceID())
-                    {
-                        herd.Add(hitColliders[i].gameObject);
-                    }
-                }
-            }
-        }
-
-        return herd;
-    }
 	/*
 	 * Retorna la mejor presa posible
 	 */
