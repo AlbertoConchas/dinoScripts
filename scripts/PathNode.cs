@@ -13,7 +13,11 @@ public class PathNode : MonoBehaviour {
 	private TextMesh textMesh;
 	private Light nodeLight;
 	private int maxTrees;
-	
+
+    public float getFertility()
+    {
+        return fertility;
+    }
 
 	// Use this for initialization
 	void Start () {

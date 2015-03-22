@@ -18,16 +18,34 @@ public class PreySearchFood : MonoBehaviour {
 
 		//Selecionar el que tiene un mayor fuzzy value
 		int max = 0;
-		for (int i = 0; i < ret.Length; i++) 
-			if ( ret [max] <= ret [i] )
-				max = i;
+        int aux = 0;
+		for (int i = 0; i < ret.Length; i++)
+            if (ret[max] <= ret[i])
+            {
+                aux = max;
+                max = i;
+            }
+				
 
 		//Si fue el ultimo, entonses la pocicion actual es la mejor
-		if ( max == ret.Length - 1) 
-			return actualPosition;
+        Debug.Log("max: " + max + " aux: " + aux + " neighbors: " + neighbors.Length);
+        if (max == ret.Length - 1)
+            return neighbors[aux].transform.position;
 		return neighbors [max].transform.position;
 	}
-	
+
+	/// <summary>
+	/// Gets the neighbourhood from a given Node as GameObject instance
+	/// </summary>
+	/// <returns>The neighbourhood as GameObject instances</returns>
+	/// <param name="actualNode">Actual node.</param>
+	public GameObject[] getNeighbourhood(GameObject actualNode)
+	{
+		if( nodes == null )
+			setNodesController();
+		return nodes.getNeighbors(actualNode);
+	}
+
 	private void setNodesController(){
 		nodes  = GameObject.Find ("Global").GetComponent<NodesController> ();
 	}
@@ -47,13 +65,13 @@ public class PreySearchFood : MonoBehaviour {
 		//Agrega los vecinos para ser procesados
 		for (int i = 0; i < neighbors.Length; i++) {
 			nodesData[0,i] = neighbors[i].GetComponent<PathNode>().getPlants();
-			nodesData[1,i] = actualNode.GetComponent<PathNode>().getPrays() + actualNode.GetComponent<PathNode>().getPredators();
-			nodesData[2,i] = 1;
+			nodesData[1,i] =  actualNode.GetComponent<PathNode>().getPredators();
+            nodesData[2, i] = actualNode.GetComponent<PathNode>().getPrays();
 		}
 		//Agrega el nodo actual para ser procesado tambien
 		nodesData[0, neighbors.Length ] = actualNode.GetComponent<PathNode>().getPlants();
-		nodesData[1, neighbors.Length ] = 1;
-		nodesData[2, neighbors.Length ] = 1;
+		nodesData[1, neighbors.Length ] = actualNode.GetComponent<PathNode>().getPredators();
+        nodesData[2, neighbors.Length] = actualNode.GetComponent<PathNode>().getPrays();
 		
 		return nodesData;
 	}

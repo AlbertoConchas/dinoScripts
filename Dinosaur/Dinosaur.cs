@@ -17,15 +17,15 @@ public class Dinosaur : MonoBehaviour{
 
     protected float stoppingDistance;
     protected NavMeshAgent nav;
-    protected GameObject leader;
 
     private List<GameObject> herd = new List<GameObject>();
+    protected GameObject leader;
     private bool requestResponded;
     private GameObject tempLeader;
 
     public enum States { ChoosingLeader, Searching, Following, Moving, Hunting, Eating,Hiding, Reproduce, Waiting, Reagruping, Die };
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------------------------------ Lider Chosing --------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   
@@ -68,10 +68,14 @@ public class Dinosaur : MonoBehaviour{
         {
             //Enviale la eleccion de lider
             if (dino != null)
+            {
                 dino.SendMessage(message, (GameObject)obj);
-            else {
+            }
+            else
+            {
                 herd.Remove(dino);
             }
+            
         }
     }
    public List<GameObject> getHerd() {
@@ -79,15 +83,16 @@ public class Dinosaur : MonoBehaviour{
    }
 
    //actualiza la manada cuando alguien muere (en especial el lider) o cuando aun no se de que manada soy
-   protected void updateHerd<T>() where T : Dinosaur
+  protected void updateHerd()
    {
        if (herd.Count == 0)
        {
            Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange);
            for (int i = 0; i < hitColliders.Length; i++)
            {
+
                //Si es un velocirraptor
-               if (hitColliders[i].GetComponent<T>() != null)
+               if (hitColliders[i].GetComponent<Dinosaur>() != null)
                {
                    //Que no soy yo
                    if (hitColliders[i].gameObject.GetInstanceID() != gameObject.GetInstanceID())
@@ -96,7 +101,8 @@ public class Dinosaur : MonoBehaviour{
                    }
                }
            }
-       } else {
+       }
+       else {
            List<GameObject> newHerd = new List<GameObject>();
 
            foreach (GameObject dino in herd)
@@ -170,7 +176,7 @@ public class Dinosaur : MonoBehaviour{
 	protected void die(){
 		state = States.Die;
 		this.GetComponent<DinasorsAnimationCorrector>().die();
-		gameObject.GetComponent<LeaderChoosing> ().enabled = false;
+		//gameObject.GetComponent<PredatorLeaderChoosing> ().enabled = false;
 		if (isMyLeader (gameObject)) 
         {
 			//LeaderSaysUnsetLeader (gameObject);
