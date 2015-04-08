@@ -136,7 +136,7 @@ public class FuzzyLogic : MonoBehaviour{
 			}
 			//Pone los valores ponderados
 			for( i=0; i < G.GetLength(1); i++  ){
-                if (G[C_Rivales, i] <= 0)
+                if (G[C_Rivales, i] >= 0)
                 {
                     ps[i] = Math.Round(((ps[i] * 100) / ProbTotal), 2);
                 }
