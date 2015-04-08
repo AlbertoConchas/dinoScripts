@@ -44,11 +44,13 @@ public class Dinosaur : MonoBehaviour{
  */
     public float getLeadershipStat()
     {
-        return
+
+        this.leadership =
             (this.hp / 100) +
                 (this.speed / 3) +
                 ((float)this.stamina / 100) +
                 ((this.lifetime * 2) / 10000);
+        return this.leadership;
     }
 
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -64,20 +66,13 @@ public class Dinosaur : MonoBehaviour{
  */
    public void BroadCast(string message, object obj)
     {
+        herd.Remove(null);
         foreach (GameObject dino in herd)
         {
-            //Enviale la eleccion de lider
-            if (dino != null)
-            {
-                dino.SendMessage(message, (GameObject)obj);
-            }
-            else
-            {
-                herd.Remove(dino);
-            }
-            
-        }
+			dino.SendMessage(message, (GameObject)obj);
+		}
     }
+
    public List<GameObject> getHerd() {
        return herd;
    }
@@ -119,7 +114,7 @@ public class Dinosaur : MonoBehaviour{
    //Retorna si el gameobject enviado es igual a la entidad actual
   protected bool isMe(GameObject g)
    {
-       if (g.GetInstanceID() == gameObject.GetInstanceID())
+       if (g!=null && gameObject!=null && g.GetInstanceID() == gameObject.GetInstanceID())
            return true;
        return false;
    }
@@ -127,7 +122,7 @@ public class Dinosaur : MonoBehaviour{
    //Retorna si el gameobject enviado es igual al lider de la unidad actual
   protected bool isMyLeader(GameObject l)
    {
-       if (l.GetInstanceID() == leader.GetInstanceID())
+       if (l!=null && leader!=null && l.GetInstanceID() == leader.GetInstanceID())
            return true;
        return false;
    }
