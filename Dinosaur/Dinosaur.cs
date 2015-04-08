@@ -83,7 +83,7 @@ public class Dinosaur : MonoBehaviour{
    }
 
    //actualiza la manada cuando alguien muere (en especial el lider) o cuando aun no se de que manada soy
-  protected void updateHerd()
+  protected void updateHerd<T>() where T:Dinosaur
    {
        if (herd.Count == 0)
        {
@@ -92,7 +92,7 @@ public class Dinosaur : MonoBehaviour{
            {
 
                //Si es un velocirraptor
-               if (hitColliders[i].GetComponent<Dinosaur>() != null)
+               if (hitColliders[i].GetComponent<T>() != null)
                {
                    //Que no soy yo
                    if (hitColliders[i].gameObject.GetInstanceID() != gameObject.GetInstanceID())
@@ -108,7 +108,7 @@ public class Dinosaur : MonoBehaviour{
            foreach (GameObject dino in herd)
            {
                // si el dino no ha muerto y el obj no ha sido destrudio.
-               if (dino != null && dino.GetComponent<Dinosaur>().state != States.Die)
+               if (dino != null && dino.GetComponent<T>().state != States.Die)
                {
                    newHerd.Add(dino);
                }
