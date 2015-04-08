@@ -17,7 +17,8 @@ public class PreyNeuronalChoose : MonoBehaviour {
 	//Node allays
 	//Alert
 	//Migration
-	public float reproduce(){
+	
+    public float reproduce(){
 		init ();
 		GameObject node = nodes.getNeartestNode (gameObject.transform.position);
 		float food = node.GetComponent<PathNode>().getPlants ();
@@ -28,6 +29,7 @@ public class PreyNeuronalChoose : MonoBehaviour {
 
 		return neural.evaluateAlert ( input );
 	}
+
 
 	public float alert(){
 		init ();

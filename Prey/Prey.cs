@@ -16,40 +16,50 @@ public class Prey : Dinosaur
 	//Enum Para los estados del seguidor
 
 
-
 	// Use this for initialization
 	void Start () {
 
         flesh = 500f;
         updateHerd<Prey>();
 
+      //  state = States.Reproduce;
+
         state = States.ChoosingLeader;
-		//Fija los parametros iniciales en torno a la escala
-		comRange = (int) ( comRange * ((float)transform.localScale.x/0.3));
-		this.stoppingDistance = travelStopDistance ();
+          //Fija los parametros iniciales en torno a la escala
+              comRange = (int) ( comRange * ((float)transform.localScale.x/0.3));
+              this.stoppingDistance = travelStopDistance ();
 
-		//Inicializa el NavMeshAgent
-		nav = GetComponent<NavMeshAgent> ();
+              //Inicializa el NavMeshAgent
+              nav = GetComponent<NavMeshAgent> ();
 
-		nav.speed = (float)speed/3;
-		if(isNeededRun)
-			nav.speed = (float)speed*3;
+              nav.speed = (float)speed/3;
+              if(isNeededRun)
+                  nav.speed = (float)speed*3;
 
-        //Si no cuenta con eleccion de lider, el es el lider
-        if (GetComponent<LeaderChoosing>() == null)
-            setLeader(gameObject);
-        else
-        {
-            GetComponent<LeaderChoosing>().choose();
-        }
+              //Si no cuenta con eleccion de lider, el es el lider
+              if (GetComponent<LeaderChoosing>() == null)
+                  setLeader(gameObject);
+              else
+              {
+                  GetComponent<LeaderChoosing>().choose();
+              }
+
+              //Inicia corrutina de crecimiento
+              StartCoroutine("preyGrow");
 	}
-
 
 	// Update is called once per frame	
 	void Update () 
     {
 		if (!metabolism ()) 
 			return;
+        /////////////////////////////////////////////////////////REPRODUCE
+        if (state == States.Reproduce)
+        {
+            ////Debug.Log("Estado de reproduccion");
+            behavior_reproduce();
+            //Debug.Log("LEader eating");
+        }else
 
 		if ( isNeededRun ){
 			nav.speed = (float)speed;
@@ -84,7 +94,6 @@ public class Prey : Dinosaur
 		}else if (state != States.ChoosingLeader) {
 
 
-
 			//LEADER BEHAVIOR 
 			if ( isMyLeader(gameObject) ) {
 
@@ -108,10 +117,8 @@ public class Prey : Dinosaur
 					////Debug.Log("Comiendo...");
 					behavior_leader_Eating();
 					//Debug.Log("LEader eating");
-				}
-
-
-
+                }
+              
 			//FOLLOWER BEHAVIOR 
 			}else{
 				if ( state == States.Following ){			//Seguir al lider
@@ -138,6 +145,13 @@ public class Prey : Dinosaur
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////// Comportamiento del lider ///////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    void behavior_reproduce()
+    {
+        GetComponent<DinosaurReproduce>().findPartner();
+        state = States.Waiting;
+    }
+
 
 	void behavior_leader_searching()
     {
@@ -668,4 +682,16 @@ public class Prey : Dinosaur
 			return false;
 		return true;
 	}
+
+
+    IEnumerator preyGrow()
+    {
+        while (gameObject.transform.localScale.x < 1)
+        {
+            gameObject.transform.localScale = new Vector3((float)(gameObject.transform.localScale.x + 0.005),
+                                                          (float)(gameObject.transform.localScale.y + 0.005), 
+                                                          (float)(gameObject.transform.localScale.z + 0.005));
+            yield return new WaitForSeconds(1);
+        }
+    }
 }

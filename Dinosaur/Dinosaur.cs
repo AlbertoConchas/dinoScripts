@@ -4,34 +4,37 @@ using System.Collections.Generic;
 
 public class Dinosaur : MonoBehaviour{
     //public Transform m_Prey;
-    public float hp = 100f;			//Salud de la entidad
-    public int np = 10;			//Nutricion aportada a quien se alimente de la entidad
-    public int speed = 2;			//Velocidad de la entidad
-    public int comRange = 10;			//Rango de comunicacion
-    public double stamina = 100f;			//Resistencia (nesesaria para correr etc....)
-    public float lifetime = 10000f;		//Tiempo de vida
-    public float attack = 10f;			//Daño que realiza la entidad
-    public float flesh = 200f;
-    public float leadership;
-    public States state;
+       public float hp = 100f;			//Salud de la entidad
+       public int np = 10;			//Nutricion aportada a quien se alimente de la entidad
+       public int speed = 2;			//Velocidad de la entidad
+       public int comRange = 10;			//Rango de comunicacion
+       public double stamina = 100f;			//Resistencia (nesesaria para correr etc....)
+       public float lifetime = 10000f;		//Tiempo de vida
+       public float attack = 10f;			//Daño que realiza la entidad
+       public float flesh = 200f;
+       public float leadership;
+       public bool female;
+   
+   public States state;
+   
+   protected float stoppingDistance;
+   protected NavMeshAgent nav;
 
-    protected float stoppingDistance;
-    protected NavMeshAgent nav;
+   private List<GameObject> herd = new List<GameObject>();
+   protected GameObject leader;
+   protected GameObject partner;
+   private bool requestResponded;
+   private GameObject tempLeader;
 
-    private List<GameObject> herd = new List<GameObject>();
-    protected GameObject leader;
-    private bool requestResponded;
-    private GameObject tempLeader;
-
-    public enum States { ChoosingLeader, Searching, Following, Moving, Hunting, Eating,Hiding, Reproduce, Waiting, Reagruping, Die };
-    //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    // ------------------------------------------------------------------------------------------------------ Lider Chosing --------------------------------------------------------------------------------------
-    //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   public enum States { ChoosingLeader, Searching, Following, Moving, Hunting, Eating,Hiding, Reproduce, Waiting, Reagruping, Die };
+   //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   // ------------------------------------------------------------------------------------------------------ Lider Chosing --------------------------------------------------------------------------------------
+   //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
   
-    /**
- *	Fijar el objeto lider
- */
+   /**
+*	Fijar el objeto lider
+*/
     public void setLeader(GameObject l)
     {
         leader = l;
@@ -39,6 +42,7 @@ public class Dinosaur : MonoBehaviour{
         state = States.Searching;
     }
 
+  
     /*
  *	Funcion que detiene al nav Agent
  */
@@ -78,7 +82,8 @@ public class Dinosaur : MonoBehaviour{
             
         }
     }
-   public List<GameObject> getHerd() {
+  
+    public List<GameObject> getHerd() {
        return herd;
    }
 
@@ -186,5 +191,7 @@ public class Dinosaur : MonoBehaviour{
                 Destroy(t.gameObject);
             }
 		}
-	}	
+	}
+
+   
 }
