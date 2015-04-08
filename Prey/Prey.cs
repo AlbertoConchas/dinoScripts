@@ -1,14 +1,13 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Assets.My_Assets.dinoScripts.search;
+
 public class Prey : Dinosaur 
 {
 	//public bool isNeededRun = false;
 	public GameObject actualFood;
     
-    //Properties for leader
-    private NodesController nodes;//A* pathfinding
     private BinaryHeap<Node> open;//A* pathfinding
     private HashSet<Node> closed;//A* pathfinding
     private PathNode lastNode;
@@ -18,9 +17,12 @@ public class Prey : Dinosaur
 
 	// Use this for initialization
 	void Start () {
+        base.start();//Init Dinosaur
 
         flesh = 500f;
         updateHerd<Prey>();
+
+        
 
         state = States.ChoosingLeader;
 		//Fija los parametros iniciales en torno a la escala
@@ -41,19 +43,15 @@ public class Prey : Dinosaur
         {
             GetComponent<LeaderChoosing>().choose();
         }
-        
 	}
 
 
 	// Update is called once per frame	
 	void Update () 
     {
-
 		if (!metabolism ()) 
 			return;
-
-        if (nodes == null)
-            setNodesController();
+			
 
         actualNode =getActualPathNode();
         priority = priorities();
@@ -106,6 +104,7 @@ public class Prey : Dinosaur
 
 			//LEADER BEHAVIOR 
 			if ( isMyLeader(gameObject) ) {
+
 				//senseForSomething();
 				 if ( state == States.Searching) {			//Entra en estado para buscar comida
 					////Debug.Log("Buscando por lugar con comida");
@@ -567,7 +566,6 @@ public class Prey : Dinosaur
 	*/
 	private Vector3 searchForFood(){
         //init data structures if needed
-		
         if (open == null)
         {
             open = new BinaryHeap<Node>(new NodeComparator());
@@ -594,101 +592,4 @@ public class Prey : Dinosaur
 		return open.RemoveRoot().getPosition();
 	}
 
-	private void setNodesController(){
-		nodes  = GameObject.Find ("Global").GetComponent<NodesController> ();
-	}
-
-	/// <summary>
-	/// Expand Neighbourhood of actual PathNode
-	/// </summary>
-	private Node[] expand()
-	{
-		GameObject actualNode = getActualNode();
-		GameObject[] nbh = nodes.getNeighbors(actualNode);
-		Node[] neighbourhood = new Node[nbh.Length];
-		PathNode p = null;
-		for (int i = 0; i < nbh.Length; i++)
-		{
-			p = nbh[i].GetComponent<PathNode>();
-			//(Vector3 position, float fertility, int plants, int predators, int f, int g)
-			neighbourhood[i] = new Node(p.transform.position, p.getFertility(), p.getPlants(),p.getPredators(), 0, 1);
-			neighbourhood[i].setF(getH(neighbourhood[i]));
-		}
-		return neighbourhood;
-	}
-
-	/// <summary>
-	/// Gets the h.
-	/// </summary>
-	/// <returns>The h.</returns>
-	/// <param name="n">N.</param>
-	private float getH(Node n)
-	{
-		float h = n.getFertility();
-		return h;
-	}
-
-    
-    /// <summary>
-    /// Transform PathNode to Node.
-    /// </summary>
-    /// <param name="n">PathNode to convert</param>
-    /// <returns>Node converted</returns>
-    private Node toNode(PathNode n)
-    {
-        Node nn = new Node(n.transform.position, n.getFertility(), n.getPlants(), n.getPredators(), 0,0);
-		nn.setF(getH(nn));
-		return nn;
-    }
-
-    /// <summary>
-    /// Transform PathNode's to Node's.
-    /// </summary>
-    /// <param name="n">PathNode's to convert</param>
-    /// <returns>Node's converted</returns>
-    private Node[] toNode(PathNode[] n)
-    {
-        Node[] nodes = new Node[n.Length];
-        for (int i = 0; i < n.Length; i++)
-        {
-			nodes[i] = toNode(n[i]);
-        }
-        return nodes;
-    }
-
-    /// <summary>
-    /// Gets the actual node
-    /// </summary>
-    /// <returns>Actual node</returns>
-    private PathNode getActualPathNode()
-    {
-        GameObject an = nodes.getNeartestNode(transform.position);	//Obtiene el nodo actual
-        return an.GetComponent<PathNode>();
-    }
-
-	/// <summary>
-	/// Gets the actual node as GameObject instance
-	/// </summary>
-	/// <returns>Actual node</returns>
-	private GameObject getActualNode()
-	{
-		return nodes.getNeartestNode(transform.position);	//Obtiene el nodo actual
-	}
-
-    /// <summary>
-    /// Get the neighbors of the actual node
-    /// </summary>
-    /// <returns>Neighbors</returns>
-    private PathNode[] getNeighbors()
-    {
-        GameObject an = nodes.getNeartestNode(transform.position);	//Obtiene el nodo actual
-		GameObject[] n = nodes.getNeighbors (an);
-        PathNode[] neighbors = new PathNode[n.Length];
-        for (int i = 0; i < n.Length; i++)
-        {
-            neighbors[i] = n[i].GetComponent<PathNode>();
-
-        }
-        return neighbors;
-    }
 }

@@ -1,3 +1,5 @@
+
+﻿using System;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,8 +17,16 @@ public class Dinosaur : MonoBehaviour{
     public float flesh = 200f;
     public float leadership;
     public States state;
-    public Priorities priority;
-    public PathNode actualNode;
+	public Priorities priority;
+	
+    protected NodesController nodes;//A* pathfinding
+	public PathNode actualNode;
+	
+    //Memory
+    protected Dictionary<Vector3, string> memory;//The memorized nodes
+    protected DateTime last_update;
+    private static int tw = 3;//Time lapse in seconds that have to be present since last update in order to store information in memory
+
     protected float stoppingDistance;
     protected NavMeshAgent nav;
 
@@ -32,7 +42,19 @@ public class Dinosaur : MonoBehaviour{
     // ------------------------------------------------------------------------------------------------------ Lider Chosing --------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  
+    protected void start()
+    {
+        if (memory == null)
+        {
+            memory = new Dictionary<Vector3, string>();
+        }
+
+        if (nodes == null)
+        {
+            setNodesController();
+        }
+    }
+
     /**
  *	Fijar el objeto lider
  */
@@ -70,7 +92,7 @@ public class Dinosaur : MonoBehaviour{
  */
    public void BroadCast(string message, object obj)
     {
-		herd.Remove(null);
+        herd.Remove(null);
        	if(herd.Count>0)
         foreach (GameObject dino in herd)
         {
@@ -152,15 +174,15 @@ public class Dinosaur : MonoBehaviour{
    */
   protected Vector3 Dispersal(Vector3 pos)
   {
-      pos.x = pos.x + (((float)Random.Range(-50, 50) / 100) * this.comRange);
-      pos.z = pos.z + (((float)Random.Range(-50, 50) / 100) * this.comRange);
+      pos.x = pos.x + (((float)UnityEngine.Random.Range(-50, 50) / 100) * this.comRange);
+      pos.z = pos.z + (((float)UnityEngine.Random.Range(-50, 50) / 100) * this.comRange);
       return pos;
   }
 
 
   protected  float travelStopDistance()
   {
-      return comRange * ((float)Random.Range(30, 50) / 100);
+      return comRange * ((float)UnityEngine.Random.Range(30, 50) / 100);
   }
 
 
@@ -205,7 +227,97 @@ public class Dinosaur : MonoBehaviour{
         if (stamina < 100 || hp < 100)
             return false;
         return true;
+    }	
+    //=============Navigation functions=================
+
+    /// <summary>
+    /// Transform PathNode to Node.
+    /// </summary>
+    /// <param name="n">PathNode to convert</param>
+    /// <returns>Node converted</returns>
+    protected Node toNode(PathNode n)
+    {
+        Node nn = new Node(n.transform.position, n.getFertility(), n.getPlants(), n.getPredators(), 0, 0);
+        nn.setF(nn.getFertility());
+        return nn;
     }
 
+    /// <summary>
+    /// Gets the actual node
+    /// </summary>
+    /// <returns>Actual node</returns>
+    protected PathNode getActualPathNode()
+    {
+        GameObject an = nodes.getNeartestNode(transform.position);	//Obtiene el nodo actual
+        return an.GetComponent<PathNode>();
+    }
 
+    /// <summary>
+    /// Gets the actual node as GameObject instance
+    /// </summary>
+    /// <returns>Actual node</returns>
+    protected GameObject getActualNode()
+    {
+        return nodes.getNeartestNode(transform.position);	//Obtiene el nodo actual
+    }
+
+    /// <summary>
+    /// Get the neighbors of the actual node
+    /// </summary>
+    /// <returns>Neighbors</returns>
+    protected PathNode[] getNeighbors()
+    {
+        GameObject an = nodes.getNeartestNode(transform.position);	//Obtiene el nodo actual
+        GameObject[] n = nodes.getNeighbors(an);
+        PathNode[] neighbors = new PathNode[n.Length];
+        for (int i = 0; i < n.Length; i++)
+        {
+            neighbors[i] = n[i].GetComponent<PathNode>();
+
+        }
+        return neighbors;
+    }
+
+    protected void setNodesController()
+    {
+        nodes = GameObject.Find("Global").GetComponent<NodesController>();
+    }
+
+    /// <summary>
+    /// Expand Neighbourhood of actual PathNode
+    /// </summary>
+    protected Node[] expand()
+    {
+        GameObject actualNode = getActualNode();
+        GameObject[] nbh = nodes.getNeighbors(actualNode);
+        Node[] neighbourhood = new Node[nbh.Length];
+        PathNode p = null;
+        for (int i = 0; i < nbh.Length; i++)
+        {
+            p = nbh[i].GetComponent<PathNode>();
+            //(Vector3 position, float fertility, int plants, int predators, int f, int g)
+            neighbourhood[i] = new Node(p.transform.position, p.getFertility(), p.getPlants(), p.getPredators(), 0, 1);
+            neighbourhood[i].setF(getH(neighbourhood[i]));
+        }
+        return neighbourhood;
+    }
+
+    /// <summary>
+    /// Gets the h.
+    /// </summary>
+    /// <returns>The h.</returns>
+    /// <param name="n">N.</param>
+    private float getH(Node n)
+    {
+        float h = n.getFertility();
+        return h;
+    }
+
+    //=============Memory functions=================
+    protected void memorize()
+    {
+        Node node = toNode(getActualPathNode());
+        memory.Add(node.getPosition(), "Saved");
+        
+    }
 }
