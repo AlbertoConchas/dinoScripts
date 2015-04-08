@@ -156,6 +156,12 @@ public class Predator : Dinosaur {
 			}
 		}
 		
+        // no se encontro comida
+        if (actualFood == null)
+        {
+            return;
+        }
+
 		nav.destination = actualFood.transform.position;
 		if( distanceFromDestination() <= distanceToBite() ){
 			nav.destination = transform.position;
@@ -436,25 +442,23 @@ public class Predator : Dinosaur {
 	/**
 	 *	Obtiene los objetos "COMIDA", cercanos a la posicion del objeto
 	 */
-	GameObject[] getNearbyFood(){
+	GameObject[] getNearbyFood()
+    {
 		int foodCounter = 0;
+        List<GameObject> preys = new List<GameObject>();
+
 		Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange*2.5f);
-		for (int i = 0; i < hitColliders.Length; i++) {
+		for (int i = 0; i < hitColliders.Length; i++) 
+        {
 			if( !isMe( hitColliders[i].gameObject ) ){ //No me lo envio a mi
-				if (hitColliders [i].GetComponent<Prey> () != null ){
+				if (hitColliders [i].GetComponent<Prey> () != null )
+                {
+                    preys.Add(hitColliders[i].gameObject);
 					foodCounter++;
 				}
 			}
 		}
-		GameObject[] ret = new GameObject[foodCounter];
-		for (int i = 0; i < hitColliders.Length; i++) {
-			if( !isMe( hitColliders[i].gameObject ) ){ //No me lo envio a mi
-				if (hitColliders [i].GetComponent<Prey> () != null ){
-					ret[--foodCounter] = hitColliders[i].gameObject;
-				}
-			}
-		}
-		return ret;
+        return preys.ToArray();
 	}
 	
 	
