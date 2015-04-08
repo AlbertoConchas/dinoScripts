@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.My_Assets.dinoScripts.search;
 
 public class Dinosaur : MonoBehaviour{
     //public Transform m_Prey;
@@ -14,7 +15,8 @@ public class Dinosaur : MonoBehaviour{
     public float flesh = 200f;
     public float leadership;
     public States state;
-
+    public Priorities priority;
+    public PathNode actualNode;
     protected float stoppingDistance;
     protected NavMeshAgent nav;
 
@@ -23,7 +25,9 @@ public class Dinosaur : MonoBehaviour{
     private bool requestResponded;
     private GameObject tempLeader;
 
-    public enum States { ChoosingLeader, Searching, Following, Moving, Hunting, Eating,Hiding, Reproduce, Waiting, Reagruping, Die };
+    public enum States { ChoosingLeader, Searching, Following, Moving, Hunting, Eating, Hiding, Reproduce, Waiting, Reagruping, Die };
+    public enum Priorities {Eat, Obey, Reproduce, Run};
+
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // ------------------------------------------------------------------------------------------------------ Lider Chosing --------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,7 +46,7 @@ public class Dinosaur : MonoBehaviour{
     /*
  *	Funcion que detiene al nav Agent
  */
-    public float getLeadershipStat()
+   public float getLeadershipStat()
     {
 
         this.leadership =
@@ -66,14 +70,21 @@ public class Dinosaur : MonoBehaviour{
  */
    public void BroadCast(string message, object obj)
     {
-        herd.Remove(null);
+		herd.Remove(null);
+       	if(herd.Count>0)
         foreach (GameObject dino in herd)
         {
-            if(dino!=null)
-			    dino.SendMessage(message, (GameObject)obj);
-		}
+            if (dino != null || dino.GetComponent<Dinosaur>().state != States.Die)
+            {
+				dino.SendMessage(message, (GameObject)obj);
+            }
+            else
+            {
+                //herd.Remove(dino);
+            }
+            
+        }
     }
-
    public List<GameObject> getHerd() {
        return herd;
    }
@@ -163,8 +174,6 @@ public class Dinosaur : MonoBehaviour{
       return (distanceFromDestination() < this.stoppingDistance * factor);
   }
 
-
-
  protected  void stop()
   {
       nav.destination = transform.position;
@@ -182,5 +191,21 @@ public class Dinosaur : MonoBehaviour{
                 Destroy(t.gameObject);
             }
 		}
-	}	
+	}
+
+    protected bool hungry()
+    {
+        if (stamina < 85f || hp < 100)
+            return true;
+        return false;
+    }
+
+    protected bool satisfied()
+    {
+        if (stamina < 100 || hp < 100)
+            return false;
+        return true;
+    }
+
+
 }
