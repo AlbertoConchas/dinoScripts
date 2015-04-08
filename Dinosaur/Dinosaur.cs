@@ -18,8 +18,8 @@ public class Dinosaur : MonoBehaviour{
     protected float stoppingDistance;
     protected NavMeshAgent nav;
 
-    private List<GameObject> herd = new List<GameObject>();
-    protected GameObject leader;
+    public List<GameObject> herd = new List<GameObject>();
+    public GameObject leader;
     private bool requestResponded;
     private GameObject tempLeader;
 
@@ -69,7 +69,8 @@ public class Dinosaur : MonoBehaviour{
         herd.Remove(null);
         foreach (GameObject dino in herd)
         {
-			dino.SendMessage(message, (GameObject)obj);
+            if(dino!=null)
+			    dino.SendMessage(message, (GameObject)obj);
 		}
     }
 
