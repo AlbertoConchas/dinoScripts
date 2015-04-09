@@ -1,23 +1,23 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Assets.My_Assets.dinoScripts.search;
 
 public class Prey : Dinosaur 
 {
-	public bool isNeededRun = false;
+	//public bool isNeededRun = false;
 	public GameObject actualFood;
     
-    //Properties for leader
-    private NodesController nodes;//A* pathfinding
     private BinaryHeap<Node> open;//A* pathfinding
     private HashSet<Node> closed;//A* pathfinding
-
+    private PathNode lastNode;
 	//Enum Para los estados del seguidor
+
 
 
 	// Use this for initialization
 	void Start () {
+        base.start();//Init Dinosaur
 
         flesh = 500f;
         updateHerd<Prey>();
@@ -25,60 +25,69 @@ public class Prey : Dinosaur
       //  state = States.Reproduce;
 
         state = States.ChoosingLeader;
-          //Fija los parametros iniciales en torno a la escala
-              comRange = (int) ( comRange * ((float)transform.localScale.x/0.3));
-              this.stoppingDistance = travelStopDistance ();
+		//Fija los parametros iniciales en torno a la escala
+		comRange = (int) ( comRange * ((float)transform.localScale.x/0.3));
+		this.stoppingDistance = travelStopDistance ();
 
-              //Inicializa el NavMeshAgent
-              nav = GetComponent<NavMeshAgent> ();
+		//Inicializa el NavMeshAgent
+		nav = GetComponent<NavMeshAgent> ();
 
-              nav.speed = (float)speed/3;
-              if(isNeededRun)
-                  nav.speed = (float)speed*3;
-
-              //Si no cuenta con eleccion de lider, el es el lider
-              if (GetComponent<LeaderChoosing>() == null)
-                  setLeader(gameObject);
-              else
-              {
-                  GetComponent<LeaderChoosing>().choose();
-              }
-
-              //Inicia corrutina de crecimiento
-              StartCoroutine("preyGrow");
+        nav.speed = (float)((stamina / 100f) * speed) / 3;
+		/*if(isNeededRun)
+			nav.speed = (float)((stamina/100f)*speed)*3;
+        */
+        //Si no cuenta con eleccion de lider, el es el lider
+        if (GetComponent<LeaderChoosing>() == null)
+            setLeader(gameObject);
+        else
+        {
+            GetComponent<LeaderChoosing>().choose();
+        }
+		StartCoroutine("preyGrow");
 	}
+
 
 	// Update is called once per frame	
 	void Update () 
     {
 		if (!metabolism ()) 
 			return;
-        /////////////////////////////////////////////////////////REPRODUCE
-        if (state == States.Reproduce)
-        {
-            ////Debug.Log("Estado de reproduccion");
-            behavior_reproduce();
-            //Debug.Log("LEader eating");
-        }else
+			
+		actualNode =getActualPathNode();
+        priority = priorities();
+		
+		if ( priority == Priorities.Run){
+            nav.speed = (float)((stamina / 100f) * speed) * 3;
+		}else
+            nav.speed = (float)((stamina / 100f) * speed) / 3;
 
-		if ( isNeededRun ){
-			nav.speed = (float)speed;
-			if ( state != States.Hiding ) 
-				isNeededRun = false;
-		}else 
-			nav.speed = (float)speed/3;
+		if (state == States.Hiding || priority ==Priorities.Run) {
 
-		if (state == States.Hiding) {
-			if ( ! isNeededRun ){
-				PreyNeuronalChoose.NeuralReturn  r = GetComponent<PreyNeuronalChoose>().migrate();
-				nav.destination = r.node.transform.position;
-				isNeededRun = true;
+           // PreyNeuronalChoose.NeuralReturn r = GetComponent<PreyNeuronalChoose>().migrate();
+            nav.destination = actualNode.getNeighbors()[0].transform.position;
+            for (int i = 0; i < actualNode.getNeighbors().Length; i++)
+			{
+                if (lastNode == null)
+                {
+                    lastNode = actualNode;
+                    nav.destination = actualNode.getNeighbors()[i].transform.position;
+                    break;
+                }
+                else if (lastNode.transform.position != actualNode.getNeighbors()[i].transform.position)
+                {
+                    nav.destination = actualNode.getNeighbors()[i].transform.position;
+                    break;
+                }
+			}
+           /*  if (actualNode.transform.position != r.node.transform.position)
+            {
+                nav.destination = r.node.transform.position;
 			}else {
 				if ( isOnRangeToStop() ){
 					stop ();
-					state = States.ChoosingLeader;
+					state = States.Searching;
 				}
-			}
+			}*/
 
         }
             // si el lider ya no existe o esta muerto y ademas no se esta seleccionando lider
@@ -93,12 +102,19 @@ public class Prey : Dinosaur
 
 		}else if (state != States.ChoosingLeader) {
 
+		/////////////////////////////////////////////////////////REPRODUCE
+	        if (state == States.Reproduce)
+	        {
+	            ////Debug.Log("Estado de reproduccion");
+	            behavior_reproduce();
+	            //Debug.Log("LEader eating");
+	        }
 
 			//LEADER BEHAVIOR 
 			if ( isMyLeader(gameObject) ) {
 
 				//senseForSomething();
-				if ( state == States.Searching) {			//Entra en estado para buscar comida
+				 if ( state == States.Searching) {			//Entra en estado para buscar comida
 					////Debug.Log("Buscando por lugar con comida");
 					behavior_leader_searching();
 					//Debug.Log("LEader searching");
@@ -117,8 +133,10 @@ public class Prey : Dinosaur
 					////Debug.Log("Comiendo...");
 					behavior_leader_Eating();
 					//Debug.Log("LEader eating");
-                }
-              
+				}
+
+
+
 			//FOLLOWER BEHAVIOR 
 			}else{
 				if ( state == States.Following ){			//Seguir al lider
@@ -149,7 +167,7 @@ public class Prey : Dinosaur
     void behavior_reproduce()
     {
         GetComponent<DinosaurReproduce>().findPartner();
-        state = States.Waiting;
+        state = States.Searching;
     }
 
 
@@ -417,12 +435,38 @@ public class Prey : Dinosaur
 
 	}
 
+
+    private Priorities priorities() {
+        if (nodes == null)
+        {
+            setNodesController();
+        }
+        if (actualNode.getPredators()>0 || state==States.Hiding){
+            return Priorities.Run;
+        }
+        else if (hungry())
+        {
+            return Priorities.Eat;
+        }else if (mature()){
+            return Priorities.Reproduce;
+        }
+        return Priorities.Obey;
+    }
+
+
+   private  bool mature() {
+       if (lifetime <= 5000f && lifetime > 1000f)
+           return true;
+       return false;
+    }
 	/**
 	 *	Funciones Biologicas de consumir energia
 	 */
 	private bool metabolism(){
 		float factor = 1f;
-		if (isNeededRun)
+        this.lifetime -= 0.007f * factor;
+
+        if (priority == Priorities.Run)
 			factor *= 2f;
 
 
@@ -432,7 +476,7 @@ public class Prey : Dinosaur
 			return false;
 		}
 		if (0 < this.stamina) {	
-			this.stamina -= 0.000001*factor;			
+			this.stamina -= 0.001*factor;			
 		}
 		if (stamina <= 0) {
 			if ( 0 < this.hp ) {	
@@ -539,20 +583,17 @@ public class Prey : Dinosaur
 	*/
 	private Vector3 searchForFood(){
         //init data structures if needed
-		if (nodes == null) 
-		{
-			setNodesController();
-		}
         if (open == null)
         {
             open = new BinaryHeap<Node>(new NodeComparator());
             closed = new HashSet<Node>(new NodeEqualityComparer());
         }
-		Node actualNode = toNode (getActualPathNode ());
-		closed.Add(actualNode);
+
+       
+		closed.Add(toNode(actualNode));
 		if (actualNode.getPlants () > 0) 
 		{
-			return actualNode.getPosition();
+            return toNode(actualNode).getPosition();
 		}
 		Node[] neighbors = expand();//Equivalent to expand step on A* algorithm
 		foreach(Node n in neighbors)
@@ -568,120 +609,6 @@ public class Prey : Dinosaur
 		return open.RemoveRoot().getPosition();
 	}
 
-	private void setNodesController(){
-		nodes  = GameObject.Find ("Global").GetComponent<NodesController> ();
-	}
-
-	/// <summary>
-	/// Expand Neighbourhood of actual PathNode
-	/// </summary>
-	private Node[] expand()
-	{
-		GameObject actualNode = getActualNode();
-		GameObject[] nbh = nodes.getNeighbors(actualNode);
-		Node[] neighbourhood = new Node[nbh.Length];
-		PathNode p = null;
-		for (int i = 0; i < nbh.Length; i++)
-		{
-			p = nbh[i].GetComponent<PathNode>();
-			//(Vector3 position, float fertility, int plants, int predators, int f, int g)
-			neighbourhood[i] = new Node(p.transform.position, p.getFertility(), p.getPlants(),p.getPredators(), 0, 1);
-			neighbourhood[i].setF(getH(neighbourhood[i]));
-		}
-		return neighbourhood;
-	}
-
-	/// <summary>
-	/// Gets the h.
-	/// </summary>
-	/// <returns>The h.</returns>
-	/// <param name="n">N.</param>
-	private float getH(Node n)
-	{
-		float h = n.getFertility();
-		return h;
-	}
-
-    
-    /// <summary>
-    /// Transform PathNode to Node.
-    /// </summary>
-    /// <param name="n">PathNode to convert</param>
-    /// <returns>Node converted</returns>
-    private Node toNode(PathNode n)
-    {
-        Node nn = new Node(n.transform.position, n.getFertility(), n.getPlants(), n.getPredators(), 0,0);
-		nn.setF(getH(nn));
-		return nn;
-    }
-
-    /// <summary>
-    /// Transform PathNode's to Node's.
-    /// </summary>
-    /// <param name="n">PathNode's to convert</param>
-    /// <returns>Node's converted</returns>
-    private Node[] toNode(PathNode[] n)
-    {
-        Node[] nodes = new Node[n.Length];
-        for (int i = 0; i < n.Length; i++)
-        {
-			nodes[i] = toNode(n[i]);
-        }
-        return nodes;
-    }
-
-    /// <summary>
-    /// Gets the actual node
-    /// </summary>
-    /// <returns>Actual node</returns>
-    private PathNode getActualPathNode()
-    {
-        GameObject an = nodes.getNeartestNode(transform.position);	//Obtiene el nodo actual
-        return an.GetComponent<PathNode>();
-    }
-
-	/// <summary>
-	/// Gets the actual node as GameObject instance
-	/// </summary>
-	/// <returns>Actual node</returns>
-	private GameObject getActualNode()
-	{
-		return nodes.getNeartestNode(transform.position);	//Obtiene el nodo actual
-	}
-
-    /// <summary>
-    /// Get the neighbors of the actual node
-    /// </summary>
-    /// <returns>Neighbors</returns>
-    private PathNode[] getNeighbors()
-    {
-		if (nodes == null)
-		{
-
-		}
-        GameObject an = nodes.getNeartestNode(transform.position);	//Obtiene el nodo actual
-		GameObject[] n = nodes.getNeighbors (an);
-        PathNode[] neighbors = new PathNode[n.Length];
-        for (int i = 0; i < n.Length; i++)
-        {
-            neighbors[i] = n[i].GetComponent<PathNode>();
-
-        }
-        return neighbors;
-    }
-
-
-	private bool hungry(){
-		if (stamina < 85f || hp < 100)
-			return true;
-		return false;
-	}
-
-	private bool satisfied(){
-		if (stamina < 100 || hp < 100)
-			return false;
-		return true;
-	}
 
 
     IEnumerator preyGrow()

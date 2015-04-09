@@ -7,6 +7,39 @@ using Assets.My_Assets.dinoScripts.search;
 
 public class Dinosaur : MonoBehaviour{
     //public Transform m_Prey;
+<<<<<<< HEAD
+       public float hp = 100f;			//Salud de la entidad
+       public int np = 10;			//Nutricion aportada a quien se alimente de la entidad
+       public int speed = 2;			//Velocidad de la entidad
+       public int comRange = 10;			//Rango de comunicacion
+       public double stamina = 100f;			//Resistencia (nesesaria para correr etc....)
+       public float lifetime = 10000f;		//Tiempo de vida
+       public float attack = 10f;			//Daño que realiza la entidad
+       public float flesh = 200f;
+       public float leadership;
+       public bool female;
+   
+   public States state;
+   
+   protected float stoppingDistance;
+   protected NavMeshAgent nav;
+
+   private List<GameObject> herd = new List<GameObject>();
+   protected GameObject leader;
+   protected GameObject partner;
+   private bool requestResponded;
+   private GameObject tempLeader;
+
+   public enum States { ChoosingLeader, Searching, Following, Moving, Hunting, Eating,Hiding, Reproduce, Waiting, Reagruping, Die };
+   //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   // ------------------------------------------------------------------------------------------------------ Lider Chosing --------------------------------------------------------------------------------------
+   //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+  
+   /**
+*	Fijar el objeto lider
+*/
+=======
     public float hp = 100f;			//Salud de la entidad
     public int np = 10;			//Nutricion aportada a quien se alimente de la entidad
     public int speed = 2;			//Velocidad de la entidad
@@ -16,7 +49,6 @@ public class Dinosaur : MonoBehaviour{
     public float attack = 10f;			//Daño que realiza la entidad
     public float flesh = 200f;
     public float leadership;
-	public bool female;
     public States state;
 	public Priorities priority;
 	
@@ -59,6 +91,7 @@ public class Dinosaur : MonoBehaviour{
     /**
  *	Fijar el objeto lider
  */
+>>>>>>> 22f948fea5d5cc3cd702a9570b0e1051fa096c02
     public void setLeader(GameObject l)
     {
         leader = l;
@@ -66,6 +99,7 @@ public class Dinosaur : MonoBehaviour{
         state = States.Searching;
     }
 
+  
     /*
  *	Funcion que detiene al nav Agent
  */
@@ -108,7 +142,8 @@ public class Dinosaur : MonoBehaviour{
             
         }
     }
-   public List<GameObject> getHerd() {
+  
+    public List<GameObject> getHerd() {
        return herd;
    }
 
@@ -216,6 +251,9 @@ public class Dinosaur : MonoBehaviour{
 		}
 	}
 
+<<<<<<< HEAD
+   
+=======
     protected bool hungry()
     {
         if (stamina < 85f || hp < 100)
@@ -321,4 +359,5 @@ public class Dinosaur : MonoBehaviour{
         memory.Add(node.getPosition(), "Saved");
         
     }
+>>>>>>> 22f948fea5d5cc3cd702a9570b0e1051fa096c02
 }

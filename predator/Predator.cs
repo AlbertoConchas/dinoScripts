@@ -34,7 +34,7 @@ public class Predator : Dinosaur {
         {
             GetComponent<LeaderChoosing>().choose();
         }
-
+        
         //Inicia corrutina de crecimiento
         StartCoroutine("predatorGrow");
 	}
@@ -42,6 +42,7 @@ public class Predator : Dinosaur {
 	
 	// Update is called once per frame	
 	void Update () {
+
 		if (!metabolism ()) 
 			return;
 
@@ -157,6 +158,12 @@ public class Predator : Dinosaur {
 			}
 		}
 		
+        // no se encontro comida
+        if (actualFood == null)
+        {
+            return;
+        }
+
 		nav.destination = actualFood.transform.position;
 		if( distanceFromDestination() <= distanceToBite() ){
 			nav.destination = transform.position;
@@ -383,7 +390,7 @@ public class Predator : Dinosaur {
 	//Mueve las estadisticas del enemigo y del agente
 	void eatEnemy(){
 		actualFood.GetComponent<Prey> ().flesh -= ((float)this.attack / (1f / Time.deltaTime))*0.6f;
-        actualFood.GetComponent<Prey>().isNeededRun = true;
+        //actualFood.GetComponent<Prey>().isNeededRun = true;
 		if ( this.stamina < 100f )
 			this.stamina += ((float)this.attack / (1f / Time.deltaTime));
 		else 
@@ -437,25 +444,23 @@ public class Predator : Dinosaur {
 	/**
 	 *	Obtiene los objetos "COMIDA", cercanos a la posicion del objeto
 	 */
-	GameObject[] getNearbyFood(){
+	GameObject[] getNearbyFood()
+    {
 		int foodCounter = 0;
+        List<GameObject> preys = new List<GameObject>();
+
 		Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange*2.5f);
-		for (int i = 0; i < hitColliders.Length; i++) {
+		for (int i = 0; i < hitColliders.Length; i++) 
+        {
 			if( !isMe( hitColliders[i].gameObject ) ){ //No me lo envio a mi
-				if (hitColliders [i].GetComponent<Prey> () != null ){
+				if (hitColliders [i].GetComponent<Prey> () != null )
+                {
+                    preys.Add(hitColliders[i].gameObject);
 					foodCounter++;
 				}
 			}
 		}
-		GameObject[] ret = new GameObject[foodCounter];
-		for (int i = 0; i < hitColliders.Length; i++) {
-			if( !isMe( hitColliders[i].gameObject ) ){ //No me lo envio a mi
-				if (hitColliders [i].GetComponent<Prey> () != null ){
-					ret[--foodCounter] = hitColliders[i].gameObject;
-				}
-			}
-		}
-		return ret;
+        return preys.ToArray();
 	}
 	
 	
@@ -482,7 +487,7 @@ public class Predator : Dinosaur {
 	private Vector3 searchForFood(){
 		return GetComponent<PredatorSearchFood> ().searchForFood (transform.position);
 	}
-	
+	/*
 	private bool hungry(){
 		if (stamina < 120f || hp < 100)
 			return true;
@@ -493,7 +498,7 @@ public class Predator : Dinosaur {
 		if (stamina < 150 || hp < 100)
 			return false;
 		return true;
-	}
+	}*/
 
 
     IEnumerator predatorGrow()
