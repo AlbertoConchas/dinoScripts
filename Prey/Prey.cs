@@ -11,6 +11,7 @@ public class Prey : Dinosaur
     private BinaryHeap<Node> open;//A* pathfinding
     private HashSet<Node> closed;//A* pathfinding
     private PathNode lastNode;
+    private int runningTime = 200;
 	//Enum Para los estados del seguidor
 
 
@@ -51,7 +52,11 @@ public class Prey : Dinosaur
     {
 		if (!metabolism ()) 
 			return;
-			
+
+        if (runningTime > 0 && priority == Priorities.Run) {
+            runningTime--;
+            return;
+        }	
 
         actualNode =getActualPathNode();
         priority = priorities();
@@ -355,6 +360,9 @@ public class Prey : Dinosaur
 	///////////////// Reacciones a ordenes del lider //////////////
 	///////////////////////////////////////////////////////////////
 	void LeaderSaysFollowMe( GameObject l ){
+        if (priority == Priorities.Run)
+            return;
+
 		if (state != States.Following && 0 < hp) {
 			if ( isMyLeader(l) ) {
 				if( !isMe(leader) ){
@@ -367,6 +375,10 @@ public class Prey : Dinosaur
 
 
 	void LeaderSaysStop( GameObject l ){
+
+        if (priority == Priorities.Run)
+            return;
+
 		if (state != States.Waiting && 0 < hp) {
 			if ( isMyLeader(l) ) {
 				if( !isMe(leader) ){
@@ -378,6 +390,9 @@ public class Prey : Dinosaur
 	}
 
 	void LeaderSaysReagrupate( GameObject l ){
+        if (priority == Priorities.Run)
+            return;
+
 		if (state != States.Reagruping &&  0 < hp) {
 			if ( isMyLeader(l) ) {
 				if( !isMe(leader) ){
@@ -390,6 +405,9 @@ public class Prey : Dinosaur
 	}
 
 	void LeaderSaysHunt( GameObject l ){
+        if (priority == Priorities.Run)
+            return;
+
 		if (state != States.Hunting && 0 < hp) {
 			if ( isMyLeader(l) ) {
 				if( !isMe(leader) ){
@@ -428,7 +446,9 @@ public class Prey : Dinosaur
         {
             setNodesController();
         }
+        //Debug.Log(actualNode.getPredators());
         if (actualNode.getPredators()>0 || state==States.Hiding){
+            runningTime = 200;
             return Priorities.Run;
         }
         else if (hungry())
