@@ -107,7 +107,6 @@ public class Prey : Dinosaur
 	        {
 	            ////Debug.Log("Estado de reproduccion");
 	            behavior_reproduce();
-	            //Debug.Log("LEader eating");
 	        }
 
 			//LEADER BEHAVIOR 

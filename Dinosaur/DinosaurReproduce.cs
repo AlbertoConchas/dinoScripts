@@ -176,7 +176,7 @@ public class DinosaurReproduce : MonoBehaviour
     private IEnumerator startElection()
     {
         selectPartner();
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(2);
     }
 
 }
