@@ -23,8 +23,14 @@ public class PredatorSearchFood : MonoBehaviour {
 				max = i;
 		
 		//Si fue el ultimo, entonses la pocicion actual es la mejor
-		if ( max == ret.Length - 1) 
-			return actualPosition;
+        if (max == ret.Length - 1)
+        {
+            max = Random.Range(0, neighbors.Length);
+			//return actualPosition;
+        } 
+
+
+
 		return neighbors [max].transform.position;
 	}
 	

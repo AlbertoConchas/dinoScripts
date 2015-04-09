@@ -16,28 +16,28 @@ namespace Assets.My_Assets.dinoScripts.search
         private Node parent;
         private float fertility;
         private int plants;
-        private int predators;
+        private int other_species;//Number of predator for preys, number of preys for other_species.
         private float f;//f(x) in A* algorithm
         private int g;//g(x) in A* algorithm
 
-        public Node(Vector3 position, float fertility, int plants, int predators, float f, int g)
+        public Node(Vector3 position, float fertility, int plants, int other_species, float f, int g)
         {
             this.position = position;
             this.parent = null;
             this.fertility = fertility;
             this.plants = plants;
-            this.predators = predators;
+            this.other_species = other_species;
             this.f = f;
             this.g = g;
         }
 
-        public Node(Vector3 position, Node parent,float fertility, int plants, int predators, float f, int g)
+        public Node(Vector3 position, Node parent,float fertility, int plants, int other_species, float f, int g)
         {
             this.position = position;
             this.parent = parent;
             this.fertility = fertility;
             this.plants = plants;
-            this.predators = predators;
+            this.other_species = other_species;
             this.f = f;
             this.g = g;
         }
@@ -82,14 +82,14 @@ namespace Assets.My_Assets.dinoScripts.search
             this.plants = plants;
         }
 
-        public int getPredators()
+        public int getother_species()
         {
-            return predators;
+            return other_species;
         }
         
-        public void setPredators(int predators)
+        public void setother_species(int other_species)
         {
-            this.predators = predators;
+            this.other_species = other_species;
         }
 
         public float getF()
