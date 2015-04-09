@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Assets.My_Assets.dinoScripts.search;
+using Assets.My_Assets.dinoScripts.Dinosaur;
 
 public class Dinosaur : MonoBehaviour{
     //public Transform m_Prey;
@@ -24,9 +25,9 @@ public class Dinosaur : MonoBehaviour{
 	public PathNode actualNode;
 	
     //Memory
-    protected Dictionary<Vector3, string> memory;//The memorized nodes
+    protected Dictionary<Vector3, Remembrance> memory;//The memorized nodes
     protected DateTime last_update;
-    private static int tw = 3;//Time lapse in seconds that have to be present since last update in order to store information in memory
+    private static int tw = 5;//Time lapse in seconds that have to be present since last update in order to store information in memory
 
     protected float stoppingDistance;
     protected NavMeshAgent nav;
@@ -47,7 +48,7 @@ public class Dinosaur : MonoBehaviour{
     {
         if (memory == null)
         {
-            memory = new Dictionary<Vector3, string>();
+            memory = new Dictionary<Vector3, Remembrance>();
         }
 
         if (nodes == null)
@@ -317,8 +318,22 @@ public class Dinosaur : MonoBehaviour{
     //=============Memory functions=================
     protected void memorize()
     {
-        Node node = toNode(getActualPathNode());
-        memory.Add(node.getPosition(), "Saved");
-        
+        if ((DateTime.Now - last_update).TotalSeconds > tw)
+        {
+            try
+            {
+                Node node = toNode(actualNode);
+                if (memory.ContainsKey(node.getPosition()))
+                {
+                    memory.Remove(node.getPosition());
+                }
+                memory.Add(node.getPosition(), new Remembrance(node));
+                last_update = DateTime.Now;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+        }
     }
 }

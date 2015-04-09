@@ -112,5 +112,15 @@ namespace Assets.My_Assets.dinoScripts.search
             this.g = g;
         }
 
+        public bool Equals(Node x, Node y)
+        {
+            return x.getPosition() == y.getPosition();
+        }
+
+        public int GetHashCode(Node item)
+        {
+            return item.getPosition().GetHashCode();
+        }
+
     }
 }
