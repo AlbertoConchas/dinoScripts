@@ -224,7 +224,7 @@ public class LeaderChoosing : MonoBehaviour {
                         newDino.setLeader(gameObject);
                         newDinoObject.GetComponent<LeaderChoosing>().unbecomeLeader();
 
-                        break;
+                        return;
                     }
                 }
             }
