@@ -50,10 +50,12 @@ public class Predator : Dinosaur {
         actualNode = getActualPathNode();
 
         memorize();
+
+
+        updateHerd<Predator>();
         
         if ((leader == null || leader.GetComponent<Predator>().state == Predator.States.Die) && state != States.ChoosingLeader)
         {
-            updateHerd<Predator>();
 
             //Si no cuenta con eleccion de lider, el es el lider
             if (GetComponent<LeaderChoosing>() == null)

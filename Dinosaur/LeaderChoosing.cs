@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LeaderChoosing : MonoBehaviour {
 
@@ -94,6 +95,20 @@ public class LeaderChoosing : MonoBehaviour {
         }
     }
 
+    /*
+     * Otro dino me quito el liderazgo
+     */
+    private void unbecomeLeader()
+    {
+        //encuentra el objeto al que se le agregara la luz
+        Transform t = gameObject.transform.Find("leaderLigth");
+        if (t == null) return;
+        else 
+        {
+            Destroy(t.gameObject);
+        }
+    }
+
     /**
      * Informar quien sera el lider
      **/
@@ -138,7 +153,13 @@ public class LeaderChoosing : MonoBehaviour {
                 tempLeader = gameObject;
             GetComponent<Dinosaur>().setLeader(tempLeader);
             if (tempLeader.GetInstanceID() == gameObject.GetInstanceID() && !requestResponded)
+            {
                 becomeLeader();
+            }
+            else 
+            {
+                unbecomeLeader();
+            }
         }
         else
         {
@@ -148,5 +169,65 @@ public class LeaderChoosing : MonoBehaviour {
 
     }
 
-	
+    internal void mergeHerd(List<GameObject> dinosDetected)
+    {
+        Dinosaur me = GetComponent<Dinosaur>();
+        List<GameObject> myHerd = me.herd;
+        int lid = me.leader.GetInstanceID();
+        int id = gameObject.GetInstanceID();
+
+        // solo mezclar manadas cuando yo soy lider
+        if (me.leader!=null && me.leader.GetInstanceID() == gameObject.GetInstanceID()) 
+        {
+            // filtrar quienes son los nuevos dinos
+            foreach (GameObject friend in myHerd) 
+            {
+                if (dinosDetected.Contains(friend)) dinosDetected.Remove(friend);
+            }
+
+            //  si hay mas de algun dino nuevo
+            if (dinosDetected.Count > 0) 
+            {
+                foreach (GameObject newDinoObject in dinosDetected) 
+                { 
+                    Dinosaur newDino = newDinoObject.GetComponent<Dinosaur>();
+
+                    // el dino nuevo es lider de su manada y podemos unir manadas!
+                    if (newDino.leader != null && newDino.leader.GetInstanceID() == newDinoObject.GetInstanceID()) 
+                    {
+
+                        // agregar dinos externos y lider externo a mi manada
+                        foreach (GameObject dinoObject in me.herd) 
+                        {
+                            Dinosaur dino = dinoObject.GetComponent<Dinosaur>();
+                            dino.herd.AddRange(newDino.herd);
+                            dino.herd.Add(newDinoObject);
+                        }
+
+                        // agregar a mi y mis dinos a manada externa
+                        foreach (GameObject dinoObject in newDino.herd)
+                        {
+                            Dinosaur dino = dinoObject.GetComponent<Dinosaur>();
+                            dino.herd.AddRange(me.herd);
+                            dino.herd.Add(gameObject);
+                            dino.setLeader(gameObject);
+                        }
+                        List<GameObject> tempHerd = new List<GameObject>(me.herd);
+                        
+                        // agregar dinos externos a mi
+                        me.herd.AddRange(newDino.herd);
+                        me.herd.Add(newDinoObject);
+
+                        // agregar mis dinos a lider externo
+                        newDino.herd.AddRange(tempHerd);
+                        newDino.herd.Add(gameObject);
+                        newDino.setLeader(gameObject);
+                        newDinoObject.GetComponent<LeaderChoosing>().unbecomeLeader();
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
