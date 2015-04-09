@@ -68,6 +68,14 @@ public class Dinosaur : MonoBehaviour{
         state = States.Searching;
     }
 
+    /**
+*	Return el objeto lider 
+*/
+    public GameObject getLeader()
+    {
+        return leader;
+    }
+
     /*
  *	Funcion que detiene al nav Agent
  */
