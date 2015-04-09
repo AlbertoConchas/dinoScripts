@@ -70,7 +70,7 @@ public class Dinosaur : MonoBehaviour{
  */
    public void BroadCast(string message, object obj)
     {
-       herd.RemoveAll(null);
+       //herd.RemoveAll(null);
        if(herd.Count>0)
         foreach (GameObject dino in herd)
         {
