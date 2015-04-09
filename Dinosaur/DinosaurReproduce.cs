@@ -52,6 +52,8 @@ public class DinosaurReproduce : MonoBehaviour
         {
             startReproduction();
         }
+        else
+            return;
     }
 
 
@@ -123,7 +125,22 @@ public class DinosaurReproduce : MonoBehaviour
         if (GetComponent<Dinosaur>().name == "stegosaurus")
         {
             path = "Assets/My Assets/stegosaurus.prefab";
-        }
+        }else
+            if (GetComponent<Dinosaur>().name == "velociraptor")
+            {
+                path = "Assets/My Assets/velociraptor.prefab";
+            }
+            else
+                if (GetComponent<Dinosaur>().name == "tiranosaurus")
+                {
+                    path = "Assets/My Assets/tiranosaurus.prefab";
+                }
+                else
+                    if (GetComponent<Dinosaur>().name == "ankylosaurus")
+                    {
+                        path = "Assets/My Assets/ankylosaurus.prefab";
+                    }
+                   
 
 
         child = (GameObject)Instantiate(Resources.LoadAssetAtPath(path, typeof(GameObject)), partner.GetComponent<Rigidbody>().position, Quaternion.identity);
@@ -156,6 +173,17 @@ public class DinosaurReproduce : MonoBehaviour
         //Daño que realiza la entidad
         child.GetComponent<Dinosaur>().attack = (a * GetComponent<Dinosaur>().attack) + ((1 - a) * partner.GetComponent<Dinosaur>().attack);
 
+       //Female
+        if ((random.Next(0, 100)/100) < 0.5)
+        {
+            child.GetComponent<Dinosaur>().female = true;
+        }
+        else
+        {
+            child.GetComponent<Dinosaur>().female = false;
+        }
+
+
         List<GameObject> momHerd = GetComponent<Dinosaur>().herd;
         List<GameObject> childHerd = new List<GameObject>(momHerd);
 
@@ -165,24 +193,15 @@ public class DinosaurReproduce : MonoBehaviour
 
 
         // agregar 
-        foreach(GameObject o in momHerd)
+        foreach (GameObject o in momHerd)
         {
             o.GetComponent<Dinosaur>().herd.Add(child);
         }
 
         momHerd.Add(child);
 
-        //Female
-        if ((random.Next(0, 100)/100) < 0.5)
-        {
-            child.GetComponent<Dinosaur>().female = true;
-        }
-        else
-        {
-            child.GetComponent<Dinosaur>().female = false;
-        }
-    
-    
+        child.GetComponent<Dinosaur>().setLeader(GetComponent<Dinosaur>().getLeader()); 
+
     }
 
     private float generateRandom(){

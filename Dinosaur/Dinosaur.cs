@@ -2,6 +2,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using Assets.My_Assets.dinoScripts.search;
 using Assets.My_Assets.dinoScripts.Dinosaur;
@@ -67,6 +68,14 @@ public class Dinosaur : MonoBehaviour{
         state = States.Repose;
     }
 
+    /**
+*	Return el objeto lider 
+*/
+    public GameObject getLeader()
+    {
+        return leader;
+    }
+
     /*
  *	Funcion que detiene al nav Agent
  */
@@ -114,38 +123,40 @@ public class Dinosaur : MonoBehaviour{
    }
 
    //actualiza la manada cuando alguien muere (en especial el lider) o cuando aun no se de que manada soy
-  protected void updateHerd<T>() where T:Dinosaur
+  protected bool updateHerd<T>() where T:Dinosaur
    {
-       if (herd.Count == 0)
-       {
-           Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange);
-           for (int i = 0; i < hitColliders.Length; i++)
-           {
+        /* Calcular los dinos en rango */
+        List<GameObject> inRangeHerd = new List<GameObject>();
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange);
+        for (int i = 0; i < hitColliders.Length; i++)
+        {
+            if (hitColliders[i].GetComponent<T>() != null)
+            {
+                if (hitColliders[i].gameObject.GetInstanceID() != gameObject.GetInstanceID())
+                {
+                    inRangeHerd.Add(hitColliders[i].gameObject);
+                }
+            }
+        }
 
-               //Si es un velocirraptor
-               if (hitColliders[i].GetComponent<T>() != null)
-               {
-                   //Que no soy yo
-                   if (hitColliders[i].gameObject.GetInstanceID() != gameObject.GetInstanceID())
-                   {
-                       herd.Add(hitColliders[i].gameObject);
-                   }
-               }
-           }
-       }
-       else {
-           List<GameObject> newHerd = new List<GameObject>();
-
-           foreach (GameObject dino in herd)
-           {
-               // si el dino no ha muerto y el obj no ha sido destrudio.
-               if (dino != null && dino.GetComponent<T>().state != States.Die)
-               {
-                   newHerd.Add(dino);
-               }
-           }
-           herd = newHerd;
-       }
+        if (herd.Count == 0) // no habia manada
+        {
+            herd = inRangeHerd;
+        }
+        else if (inRangeHerd.Count==0)
+        {
+            return false;
+        }
+        else if (inRangeHerd.Count <= herd.Count && !herd.Except(inRangeHerd).Any()) // la manada decremento o permanecio igual
+        {
+            return false;
+        }
+        else // mas mas dinos en la manada!
+        {
+            GetComponent<LeaderChoosing>().mergeHerd(inRangeHerd);
+            //herd = inRangeHerd;
+        }
+        return true;
    }
    //Retorna si el gameobject enviado es igual a la entidad actual
   protected bool isMe(GameObject g)

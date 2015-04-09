@@ -50,10 +50,12 @@ public class Predator : Dinosaur {
         actualNode = getActualPathNode();
 
         memorize();
+
+
+        updateHerd<Predator>();
         
         if ((leader == null || leader.GetComponent<Predator>().state == Predator.States.Die) && state != States.ChoosingLeader)
         {
-            updateHerd<Predator>();
 
             //Si no cuenta con eleccion de lider, el es el lider
             if (GetComponent<LeaderChoosing>() == null)
@@ -67,7 +69,13 @@ public class Predator : Dinosaur {
 	
 		} else if (state != States.ChoosingLeader) {
 
+            /////////////////////////////////////////////////////////REPRODUCE
+            if (state == States.Reproduce)
+            {
+                ////Debug.Log("Estado de reproduccion");
+                behavior_reproduce();
 
+            }
 
 			//LEADER BEHAVIOR 
 			if ( isMyLeader(gameObject) ) {
@@ -117,8 +125,15 @@ public class Predator : Dinosaur {
 			}
 		}
 	}
-	
-	
+
+    /// Reproduce
+
+    void behavior_reproduce()
+    {
+        GetComponent<DinosaurReproduce>().findPartner();
+        state = States.Searching;
+    }
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////// Comportamiento del lider ///////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -71,6 +71,8 @@ public class Prey : Dinosaur
         else
             nav.speed = (float)((stamina / 100f) * speed) / 3;
 
+        updateHerd<Prey>();
+
         if (state == States.Hiding || priority == Priorities.Run)
         {
 
@@ -105,7 +107,7 @@ public class Prey : Dinosaur
         // si el lider ya no existe o esta muerto y ademas no se esta seleccionando lider
         else if ((leader == null || leader.GetComponent<Prey>().state == Prey.States.Die) && state != States.ChoosingLeader)
         {
-            updateHerd<Prey>();
+            
             if (GetComponent<LeaderChoosing>() == null)
                 setLeader(gameObject);
             else
@@ -123,7 +125,7 @@ public class Prey : Dinosaur
             {
                 ////Debug.Log("Estado de reproduccion");
                 behavior_reproduce();
-                //Debug.Log("LEader eating");
+                
             }
 
             //LEADER BEHAVIOR 
@@ -206,16 +208,21 @@ public class Prey : Dinosaur
     }
 
 
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////// Comportamiento del lider ///////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  
+    /// Reproduce
+  
     void behavior_reproduce()
     {
         GetComponent<DinosaurReproduce>().findPartner();
         state = States.Searching;
     }
 
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////// Comportamiento del lider ///////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    
 
     void behavior_leader_searching()
     {
