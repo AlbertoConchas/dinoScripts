@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Assets.My_Assets.dinoScripts.search;
@@ -46,13 +46,15 @@ public class Dinosaur : MonoBehaviour{
     /*
  *	Funcion que detiene al nav Agent
  */
-    public float getLeadershipStat()
+   public float getLeadershipStat()
     {
-        return
+
+        this.leadership =
             (this.hp / 100) +
                 (this.speed / 3) +
                 ((float)this.stamina / 100) +
                 ((this.lifetime * 2) / 10000);
+        return this.leadership;
     }
 
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -68,6 +70,7 @@ public class Dinosaur : MonoBehaviour{
  */
    public void BroadCast(string message, object obj)
     {
+       herd.RemoveAll(null);
        if(herd.Count>0)
         foreach (GameObject dino in herd)
         {
@@ -172,8 +175,6 @@ public class Dinosaur : MonoBehaviour{
       return (distanceFromDestination() < this.stoppingDistance * factor);
   }
 
-
-
  protected  void stop()
   {
       nav.destination = transform.position;
@@ -206,4 +207,6 @@ public class Dinosaur : MonoBehaviour{
             return false;
         return true;
     }
+
+
 }

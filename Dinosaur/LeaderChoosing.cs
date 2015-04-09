@@ -79,7 +79,7 @@ public class LeaderChoosing : MonoBehaviour {
             brigth.light.type = LightType.Spot;								//Se elije el tipo de luz SPOT
 
             //Se pone la mira hacia abajo
-            brigth.transform.position = brigth.transform.parent.position + new Vector3(0, 2, 0);
+            brigth.transform.position = brigth.transform.parent.position + new Vector3(0, 3, 0);
             brigth.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
 
             //Color, Alcance, Dispercion
