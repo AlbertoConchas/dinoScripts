@@ -1,4 +1,4 @@
-﻿<<<<<<< HEAD
+<<<<<<< HEAD
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,14 +35,14 @@ public class Predator : Dinosaur {
         {
             GetComponent<LeaderChoosing>().choose();
         }
-        priority = Priorities.Obey;
-		
+
+        //Inicia corrutina de crecimiento
+        StartCoroutine("predatorGrow");
 	}
 	
 	
 	// Update is called once per frame	
 	void Update () {
-
 		if (!metabolism ()) 
 			return;
 
@@ -384,7 +384,7 @@ public class Predator : Dinosaur {
 	//Mueve las estadisticas del enemigo y del agente
 	void eatEnemy(){
 		actualFood.GetComponent<Prey> ().flesh -= ((float)this.attack / (1f / Time.deltaTime))*0.6f;
-        //actualFood.GetComponent<Prey>().isNeededRun = true;
+        actualFood.GetComponent<Prey>().isNeededRun = true;
 		if ( this.stamina < 100f )
 			this.stamina += ((float)this.attack / (1f / Time.deltaTime));
 		else 
@@ -483,7 +483,7 @@ public class Predator : Dinosaur {
 	private Vector3 searchForFood(){
 		return GetComponent<PredatorSearchFood> ().searchForFood (transform.position);
 	}
-	/*
+	
 	private bool hungry(){
 		if (stamina < 120f || hp < 100)
 			return true;
@@ -494,7 +494,19 @@ public class Predator : Dinosaur {
 		if (stamina < 150 || hp < 100)
 			return false;
 		return true;
-	}*/
+	}
+
+
+    IEnumerator predatorGrow()
+    {
+        while (gameObject.transform.localScale.x < 1)
+        {
+            gameObject.transform.localScale = new Vector3((float)(gameObject.transform.localScale.x + 0.005),
+                                                          (float)(gameObject.transform.localScale.y + 0.005),
+                                                          (float)(gameObject.transform.localScale.z + 0.005));
+            yield return new WaitForSeconds(1);
+        }
+    }
 =======
 ﻿using UnityEngine;
 using System.Collections;
@@ -532,13 +544,13 @@ public class Predator : Dinosaur {
         {
             GetComponent<LeaderChoosing>().choose();
         }
-        
 		
 	}
 	
 	
 	// Update is called once per frame	
 	void Update () {
+
 		if (!metabolism ()) 
 			return;
 
@@ -886,7 +898,7 @@ public class Predator : Dinosaur {
 	//Mueve las estadisticas del enemigo y del agente
 	void eatEnemy(){
 		actualFood.GetComponent<Prey> ().flesh -= ((float)this.attack / (1f / Time.deltaTime))*0.6f;
-        actualFood.GetComponent<Prey>().isNeededRun = true;
+        //actualFood.GetComponent<Prey>().isNeededRun = true;
 		if ( this.stamina < 100f )
 			this.stamina += ((float)this.attack / (1f / Time.deltaTime));
 		else 
@@ -983,7 +995,7 @@ public class Predator : Dinosaur {
 	private Vector3 searchForFood(){
 		return GetComponent<PredatorSearchFood> ().searchForFood (transform.position);
 	}
-	
+	/*
 	private bool hungry(){
 		if (stamina < 120f || hp < 100)
 			return true;
@@ -994,6 +1006,6 @@ public class Predator : Dinosaur {
 		if (stamina < 150 || hp < 100)
 			return false;
 		return true;
-	}
->>>>>>> dcbaf525f0697696551f290c854a9d7bbbc15d9b
+	}*/
+>>>>>>> 22f948fea5d5cc3cd702a9570b0e1051fa096c02
 }

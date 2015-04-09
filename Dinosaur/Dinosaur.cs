@@ -16,6 +16,7 @@ public class Dinosaur : MonoBehaviour{
     public float attack = 10f;			//Daño que realiza la entidad
     public float flesh = 200f;
     public float leadership;
+	public bool female;
     public States state;
 	public Priorities priority;
 	

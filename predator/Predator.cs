@@ -34,7 +34,9 @@ public class Predator : Dinosaur {
         {
             GetComponent<LeaderChoosing>().choose();
         }
-		
+        
+        //Inicia corrutina de crecimiento
+        StartCoroutine("predatorGrow");
 	}
 	
 	
@@ -497,4 +499,16 @@ public class Predator : Dinosaur {
 			return false;
 		return true;
 	}*/
+
+
+    IEnumerator predatorGrow()
+    {
+        while (gameObject.transform.localScale.x < 1)
+        {
+            gameObject.transform.localScale = new Vector3((float)(gameObject.transform.localScale.x + 0.005),
+                                                          (float)(gameObject.transform.localScale.y + 0.005),
+                                                          (float)(gameObject.transform.localScale.z + 0.005));
+            yield return new WaitForSeconds(1);
+        }
+    }
 }

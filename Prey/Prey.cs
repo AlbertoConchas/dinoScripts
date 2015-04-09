@@ -23,7 +23,7 @@ public class Prey : Dinosaur
         flesh = 500f;
         updateHerd<Prey>();
 
-        
+      //  state = States.Reproduce;
 
         state = States.ChoosingLeader;
 		//Fija los parametros iniciales en torno a la escala
@@ -44,6 +44,7 @@ public class Prey : Dinosaur
         {
             GetComponent<LeaderChoosing>().choose();
         }
+		StartCoroutine("preyGrow");
 	}
 
 
@@ -52,7 +53,6 @@ public class Prey : Dinosaur
     {
 		if (!metabolism ()) 
 			return;
-
         if (runningTime > 0 && priority == Priorities.Run) {
             runningTime--;
             return;
@@ -60,7 +60,7 @@ public class Prey : Dinosaur
 
         actualNode =getActualPathNode();
         priority = priorities();
-
+		
 		if ( priority == Priorities.Run){
             nav.speed = (float)((stamina / 100f) * speed) * 3;
 		}else
@@ -107,7 +107,13 @@ public class Prey : Dinosaur
 
 		}else if (state != States.ChoosingLeader) {
 
-
+		/////////////////////////////////////////////////////////REPRODUCE
+	        if (state == States.Reproduce)
+	        {
+	            ////Debug.Log("Estado de reproduccion");
+	            behavior_reproduce();
+	            //Debug.Log("LEader eating");
+	        }
 
 			//LEADER BEHAVIOR 
 			if ( isMyLeader(gameObject) ) {
@@ -162,6 +168,13 @@ public class Prey : Dinosaur
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////// Comportamiento del lider ///////////////////////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    void behavior_reproduce()
+    {
+        GetComponent<DinosaurReproduce>().findPartner();
+        state = States.Searching;
+    }
+
 
 	void behavior_leader_searching()
     {
@@ -616,4 +629,16 @@ public class Prey : Dinosaur
 		return open.RemoveRoot().getPosition();
 	}
 
+
+
+    IEnumerator preyGrow()
+    {
+        while (gameObject.transform.localScale.x < 1)
+        {
+            gameObject.transform.localScale = new Vector3((float)(gameObject.transform.localScale.x + 0.005),
+                                                          (float)(gameObject.transform.localScale.y + 0.005), 
+                                                          (float)(gameObject.transform.localScale.z + 0.005));
+            yield return new WaitForSeconds(1);
+        }
+    }
 }
