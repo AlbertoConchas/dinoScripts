@@ -8,6 +8,7 @@ public class PathNode : MonoBehaviour {
     public GameObject forest;
 
 	public float ratius;
+
 	private float fertility;
 	private float linkVisibleDuration = 40f;
 	private TextMesh textMesh;
@@ -53,7 +54,6 @@ public class PathNode : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		int c = getPlants ();
-
 		//Cambia el color de la luz
 		nodeLight.color = getNodeColor( c );
 
@@ -140,7 +140,7 @@ public class PathNode : MonoBehaviour {
 		Collider[] hitColliders = Physics.OverlapSphere(transform.position, this.ratius);
 		
 		//Por cada objeto encontrado
-		int predators = 1;
+		int predators = 0;
 		for (int i = 0; i < hitColliders.Length; i++) {
 			
 			//Si es un velocirraptor
