@@ -156,6 +156,22 @@ public class DinosaurReproduce : MonoBehaviour
         //Daño que realiza la entidad
         child.GetComponent<Dinosaur>().attack = (a * GetComponent<Dinosaur>().attack) + ((1 - a) * partner.GetComponent<Dinosaur>().attack);
 
+        List<GameObject> momHerd = GetComponent<Dinosaur>().herd;
+        List<GameObject> childHerd = new List<GameObject>(momHerd);
+
+        // agregar madre al herd del hijo
+        child.GetComponent<Dinosaur>().herd = childHerd;
+        child.GetComponent<Dinosaur>().herd.Add(gameObject);
+
+
+        // agregar 
+        foreach(GameObject o in momHerd)
+        {
+            o.GetComponent<Dinosaur>().herd.Add(child);
+        }
+
+        momHerd.Add(child);
+
         //Female
         if ((random.Next(0, 100)/100) < 0.5)
         {
