@@ -73,10 +73,12 @@ public class Prey : Dinosaur
                 {
                     lastNode = actualNode;
                     nav.destination = actualNode.getNeighbors()[i].transform.position;
+                    break;
                 }
                 else if (lastNode.transform.position != actualNode.getNeighbors()[i].transform.position)
                 {
                     nav.destination = actualNode.getNeighbors()[i].transform.position;
+                    break;
                 }
 			}
            /*  if (actualNode.transform.position != r.node.transform.position)
@@ -450,8 +452,10 @@ public class Prey : Dinosaur
 	 */
 	private bool metabolism(){
 		float factor = 1f;
+        this.lifetime -= 0.007f * factor;
+
         if (priority == Priorities.Run)
-			factor *= 3f;
+			factor *= 2f;
 
 
 		if ( state == States.Die ){
