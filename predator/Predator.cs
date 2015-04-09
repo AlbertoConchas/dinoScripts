@@ -10,7 +10,8 @@ public class Predator : Dinosaur {
 	
 	// Use this for initialization
 	void Start () {
-        
+        base.start();//Init Dinosaur
+
 		state = States.ChoosingLeader;
         updateHerd<Predator>();
 
@@ -43,10 +44,13 @@ public class Predator : Dinosaur {
 	// Update is called once per frame	
 	void Update () {
 
-		if (!metabolism ()) 
+		if (!metabolism()) 
 			return;
 
+        actualNode = getActualPathNode();
 
+        memorize();
+        
         if ((leader == null || leader.GetComponent<Predator>().state == Predator.States.Die) && state != States.ChoosingLeader)
         {
             updateHerd<Predator>();
