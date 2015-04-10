@@ -38,7 +38,7 @@ public class Dinosaur : MonoBehaviour{
     private bool requestResponded;
     private GameObject tempLeader;
 
-    public enum States { ChoosingLeader, Searching, Following, Moving, Hunting, Eating, Hiding, Reproduce, Waiting, Reagruping, Die };
+    public enum States { ChoosingLeader, Searching, Following, Moving, Hunting, Eating, Hiding, Reproduce, Repose, Reagruping, Die };
     public enum Priorities {Eat, Obey, Reproduce, Run};
 
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ public class Dinosaur : MonoBehaviour{
     {
         leader = l;
         nav.avoidancePriority = 1;
-        state = States.Searching;
+        state = States.Repose;
     }
 
     /**

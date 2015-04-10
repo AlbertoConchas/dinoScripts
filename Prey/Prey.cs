@@ -11,7 +11,7 @@ public class Prey : Dinosaur
     private BinaryHeap<Node> open;//A* pathfinding
     private HashSet<Node> closed;//A* pathfinding
     private PathNode lastNode;
-    private int runningTime = 200;
+    public int runningTime = 200;
     //Enum Para los estados del seguidor
 
 
@@ -101,6 +101,7 @@ public class Prey : Dinosaur
                      state = States.Searching;
                  }
              }*/
+            state = States.Searching;
 
         }
         // si el lider ya no existe o esta muerto y ademas no se esta seleccionando lider
@@ -119,6 +120,7 @@ public class Prey : Dinosaur
         {
 
             /////////////////////////////////////////////////////////REPRODUCE
+            
             if (state == States.Reproduce)
             {
                 ////Debug.Log("Estado de reproduccion");
@@ -129,9 +131,13 @@ public class Prey : Dinosaur
             //LEADER BEHAVIOR 
             if (isMyLeader(gameObject))
             {
-
+                if (priority == Priorities.Run)
+                {
+                    order_panic(gameObject);
+                    state = States.Hiding;
+                }
                 //senseForSomething();
-                if (state == States.Searching)
+                else if (state == States.Searching)
                 {			//Entra en estado para buscar comida
                     ////Debug.Log("Buscando por lugar con comida");
                     behavior_leader_searching();
@@ -158,6 +164,11 @@ public class Prey : Dinosaur
                     behavior_leader_Eating();
                     //Debug.Log("LEader eating");
                 }
+                else if (state == States.Repose && priority==Priorities.Eat)
+                {
+                    state = States.Searching;
+
+                }
 
 
 
@@ -170,11 +181,13 @@ public class Prey : Dinosaur
                     behavior_follower_following();
 
                 }
-                else if (state == States.Waiting)
+               /* else if (state==States.Repose || leader.GetComponent<Prey>().actualNode.transform.position == actualNode.transform.position)
                 {		//Esperar a que el lider tome una decicion
+                    if (state != States.Repose)
+                        state = States.Repose;
                     behavior_follower_waiting();
 
-                }
+                }*/
                 else if (state == States.Reagruping)
                 {
 
@@ -294,7 +307,8 @@ public class Prey : Dinosaur
 
         if (satisfied())
         {
-            state = States.Searching;
+            state = States.Repose;
+            order_stop(gameObject);
             this.GetComponent<DinasorsAnimationCorrector>().idle();
         }
     }
@@ -314,12 +328,13 @@ public class Prey : Dinosaur
         nav.stoppingDistance = travelStopDistance();
         nav.destination = leader.transform.position;
 
-        /*if( leader.GetComponent<Prey>().state != States.Following && leader.GetComponent<Prey>().state != States.Searching){
+        if (leader.GetComponent<Prey>().state == States.Repose && leader.GetComponent<Prey>().actualNode.transform.position == actualNode.transform.position)
+        {
             if( isOnRangeToStop() ){
                 stop();
-                state = States.Waiting;
+                state = States.Repose;
             }
-        }*/
+        }
     }
 
     void behavior_follower_waiting()
@@ -397,7 +412,7 @@ public class Prey : Dinosaur
 
         if (satisfied())
         {
-            state = States.Following;
+            state = States.Repose;
             nav.stoppingDistance = travelStopDistance();
             this.GetComponent<DinasorsAnimationCorrector>().idle();
         }
@@ -468,13 +483,17 @@ public class Prey : Dinosaur
         if (priority == Priorities.Run)
             return;
 
-        if (state != States.Waiting && 0 < hp)
+        if (state != States.Repose && 0 < hp)
         {
             if (isMyLeader(l))
             {
                 if (!isMe(leader))
                 {
-                    state = States.Waiting;
+                    if (leader.GetComponent<Prey>().actualNode.transform.position == actualNode.transform.position)
+                    {
+                        state = States.Repose;
+                    }
+                    else state = States.Following;
                     order_stop(l);	//Reply the message to others
                 }
             }
@@ -548,12 +567,10 @@ public class Prey : Dinosaur
 
     private Priorities priorities()
     {
-        if (nodes == null)
-        {
-            setNodesController();
-        }
+       
         if (actualNode.getPredators() > 0 || state == States.Hiding)
         {
+            runningTime = 200;
             return Priorities.Run;
         }
         else if (hungry())

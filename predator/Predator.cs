@@ -109,7 +109,7 @@ public class Predator : Dinosaur {
 				if ( state == States.Following ){			//Seguir al lider
 					behavior_follower_following();
 					
-				}else if ( state == States.Waiting ){		//Esperar a que el lider tome una decicion
+				}else if ( state == States.Repose ){		//Esperar a que el lider tome una decicion
 					behavior_follower_waiting();
 					
 				}else if ( state == States.Reagruping ){	
@@ -346,10 +346,10 @@ public class Predator : Dinosaur {
 	
 	
 	void LeaderSaysStop( GameObject l ){
-		if (state != States.Waiting  && 0 < hp  ) {
+		if (state != States.Repose  && 0 < hp  ) {
 			if ( isMyLeader(l) ) {
 				if( !isMe(leader) ){
-					state = States.Waiting;
+                    state = States.Repose;
 					order_stop(l);	//Reply the message to others
 				}
 			}
