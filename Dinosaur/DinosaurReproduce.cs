@@ -11,11 +11,6 @@ public class DinosaurReproduce : MonoBehaviour
     private GameObject child;
 
     private List<GameObject> posiblePartner = new List<GameObject>();
-    //Probability of crossover between the parents
-    private float a = 0.5f;
-
-    //Probability of mutation 
-    private float p = 0.4f;
 
     private System.Random random = new System.Random();
 
@@ -79,62 +74,49 @@ public class DinosaurReproduce : MonoBehaviour
     {
         if (GetComponent<Dinosaur>().female)
         {
-            crossover();
-            mutation();
+            crossover(GetComponent<Dinosaur>().crossover);
+            mutation(GetComponent<Dinosaur>().mutation);
         }
     }
 
-    private void mutation()
+    private void mutation(float p)
     { 
         //Genotipe Uniform
        
 
-       //Salud de la entidad
-        if (generateRandom() < p) {
-            child.GetComponent<Dinosaur>().hp = random.Next(50,700); 
-        }
-
-        //Nutricion aportada a quien se alimente
-        if (generateRandom() < p)
-        {
-            child.GetComponent<Dinosaur>().np = random.Next(10, 600);
-        }
-
-
         //Velocidad de la entidad
         if (generateRandom() < p)
         {
-            child.GetComponent<Dinosaur>().speed = random.Next(2, 500);
+            child.GetComponent<Dinosaur>().speed = random.Next(6, 10);
         }
-
 
         //Rango de comunicacion
         if (generateRandom() < p)
         {
-            child.GetComponent<Dinosaur>().comRange = random.Next(500, 3000);
+            child.GetComponent<Dinosaur>().comRange = random.Next(8,12);
         }
 
         //Resistencia (nesesaria para correr etc....)
         if (generateRandom() < p)
         {
-            child.GetComponent<Dinosaur>().stamina = random.Next(10, 5000);
+            child.GetComponent<Dinosaur>().stamina = random.Next(100, 110);
         }
 
         //Tiempo de vida
         if (generateRandom() < p)
         {
-            child.GetComponent<Dinosaur>().lifetime = random.Next(1000, 100000);
+            child.GetComponent<Dinosaur>().lifetime = random.Next(540, 720);
         }
 
         //Daño que realiza la entidad
         if (generateRandom() < p)
         {
-            child.GetComponent<Dinosaur>().attack = random.Next(5, 7000);
+            child.GetComponent<Dinosaur>().attack = random.Next(6,16);
         }
     }
 
 
-    private void crossover()
+    private void crossover(float a)
     {
         String path = "";
         //Depredator
@@ -191,9 +173,6 @@ public class DinosaurReproduce : MonoBehaviour
         //Salud de la entidad
         child.GetComponent<Dinosaur>().hp = (a * GetComponent<Dinosaur>().hp) + ((1 - a) * partner.GetComponent<Dinosaur>().hp);
 
-        //Nutricion aportada a quien se alimente de la entidad
-        child.GetComponent<Dinosaur>().np = (int)((a * GetComponent<Dinosaur>().np) + ((1 - a) * partner.GetComponent<Dinosaur>().np));
-
         //Velocidad de la entidad
         child.GetComponent<Dinosaur>().speed = (int)((a * GetComponent<Dinosaur>().speed) + ((1 - a) * partner.GetComponent<Dinosaur>().speed));
 
@@ -210,7 +189,7 @@ public class DinosaurReproduce : MonoBehaviour
         child.GetComponent<Dinosaur>().attack = (a * GetComponent<Dinosaur>().attack) + ((1 - a) * partner.GetComponent<Dinosaur>().attack);
 
        //Female
-        if ((random.Next(0, 100)/100) < 0.5)
+        if (random.Next(0, 100) < 50)
         {
             child.GetComponent<Dinosaur>().female = true;
         }
