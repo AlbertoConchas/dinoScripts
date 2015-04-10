@@ -6,20 +6,21 @@ using System.Linq;
 using System.Collections.Generic;
 using Assets.My_Assets.dinoScripts.search;
 using Assets.My_Assets.dinoScripts.Dinosaur;
+using Assets.My_Assets;
 
-public class Dinosaur : MonoBehaviour{
-    //public Transform m_Prey;
-    public float hp = 100f;			//Salud de la entidad
+public class Dinosaur : DinoObject{
+   /* //public Transform m_Prey;
+    public float hp = 100f;			//Salud de la entidad*/
     public int np = 10;			//Nutricion aportada a quien se alimente de la entidad
-    public int speed = 2;			//Velocidad de la entidad
+  /*  public int speed = 2;			//Velocidad de la entidad
     public int comRange = 10;			//Rango de comunicacion
     public double stamina = 100f;			//Resistencia (nesesaria para correr etc....)
     public float lifetime = 10000f;		//Tiempo de vida
     public float attack = 10f;			//Daño que realiza la entidad
     public float flesh = 200f;
-    public float leadership;
 	public bool female;
-    public States state;
+    public States state;*/
+    public float leadership;
 	public Priorities priority;
 	
     protected NodesController nodes;//A* pathfinding
@@ -31,14 +32,11 @@ public class Dinosaur : MonoBehaviour{
     private static int tw = 5;//Time lapse in seconds that have to be present since last update in order to store information in memory
 
     protected float stoppingDistance;
-    protected NavMeshAgent nav;
+    //protected NavMeshAgent nav;
 
-    public List<GameObject> herd = new List<GameObject>();
-    public GameObject leader;
     private bool requestResponded;
     private GameObject tempLeader;
 
-    public enum States { ChoosingLeader, Searching, Following, Moving, Hunting, Eating, Hiding, Reproduce, Repose, Reagruping, Die };
     public enum Priorities {Eat, Obey, Reproduce, Run};
 
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -65,7 +63,7 @@ public class Dinosaur : MonoBehaviour{
     {
         leader = l;
         nav.avoidancePriority = 1;
-        state = States.Repose;
+        state = States.Waiting;
     }
 
     /**
@@ -100,7 +98,7 @@ public class Dinosaur : MonoBehaviour{
  * Funcion para enviar a todos los objetos cercanos
  * string Messaage: Funcion que sera ejecutada en los objetos encontrados
  * object obj: Parametros para enviar a esa funcion
- */
+ *
    public void BroadCast(string message, object obj)
     {
         herd.Remove(null);
@@ -117,7 +115,7 @@ public class Dinosaur : MonoBehaviour{
             }
             
         }
-    }
+    }*/
    public List<GameObject> getHerd() {
        return herd;
    }
@@ -158,40 +156,6 @@ public class Dinosaur : MonoBehaviour{
         }
         return true;
    }
-   //Retorna si el gameobject enviado es igual a la entidad actual
-  protected bool isMe(GameObject g)
-   {
-       if (g!=null && gameObject!=null && g.GetInstanceID() == gameObject.GetInstanceID())
-           return true;
-       return false;
-   }
-
-   //Retorna si el gameobject enviado es igual al lider de la unidad actual
-  protected bool isMyLeader(GameObject l)
-   {
-       if (l!=null && leader!=null && l.GetInstanceID() == leader.GetInstanceID())
-           return true;
-       return false;
-   }
-
-   /**
-*	Regresa la distancia desde la posicion actual a el destino deseado
-*/
-  protected float distanceFromDestination()
-   {
-       return Vector3.Distance(transform.position, nav.destination);
-   }
-
-  /*
-   *	Regresa una pocicion aleatoria alrededor de la pocicion dada
-   */
-  protected Vector3 Dispersal(Vector3 pos)
-  {
-      pos.x = pos.x + (((float)UnityEngine.Random.Range(-50, 50) / 100) * this.comRange);
-      pos.z = pos.z + (((float)UnityEngine.Random.Range(-50, 50) / 100) * this.comRange);
-      return pos;
-  }
-
 
   protected  float travelStopDistance()
   {
@@ -206,7 +170,7 @@ public class Dinosaur : MonoBehaviour{
 
   protected bool isOnRangeToStop(float factor)
   {
-      return (distanceFromDestination() < this.stoppingDistance * factor);
+      return (DistanceFromDestination() < this.stoppingDistance * factor);
   }
 
  protected  void stop()
@@ -217,7 +181,7 @@ public class Dinosaur : MonoBehaviour{
 		state = States.Die;
 		this.GetComponent<DinasorsAnimationCorrector>().die();
 		//gameObject.GetComponent<PredatorLeaderChoosing> ().enabled = false;
-		if (isMyLeader (gameObject)) 
+		if (IsMyLeader (gameObject)) 
         {
 			//LeaderSaysUnsetLeader (gameObject);
             Transform t = gameObject.transform.Find("leaderLigth");

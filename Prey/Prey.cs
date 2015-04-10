@@ -5,9 +5,6 @@ using Assets.My_Assets.dinoScripts.search;
 
 public class Prey : Dinosaur
 {
-    //public bool isNeededRun = false;
-    public GameObject actualFood;
-
     private BinaryHeap<Node> open;//A* pathfinding
     private HashSet<Node> closed;//A* pathfinding
     private PathNode lastNode;
@@ -130,7 +127,7 @@ public class Prey : Dinosaur
             }
 
             //LEADER BEHAVIOR 
-            if (isMyLeader(gameObject))
+            if (IsMyLeader(gameObject))
             {
                 if (priority == Priorities.Run)
                 {
@@ -165,7 +162,7 @@ public class Prey : Dinosaur
                     behavior_leader_Eating();
                     //Debug.Log("LEader eating");
                 }
-                else if (state == States.Repose && priority==Priorities.Eat)
+                else if (state == States.Waiting && priority == Priorities.Eat)
                 {
                     state = States.Searching;
 
@@ -273,7 +270,7 @@ public class Prey : Dinosaur
         }
 
         nav.destination = actualFood.transform.position;
-        if (distanceFromDestination() <= distanceToBite())
+        if (DistanceFromDestination() <= distanceToBite())
         {
             nav.destination = transform.position;
             transform.LookAt(actualFood.transform);
@@ -308,7 +305,7 @@ public class Prey : Dinosaur
 
         if (satisfied())
         {
-            state = States.Repose;
+            state = States.Waiting;
             order_stop(gameObject);
             this.GetComponent<DinasorsAnimationCorrector>().idle();
         }
@@ -329,11 +326,11 @@ public class Prey : Dinosaur
         nav.stoppingDistance = travelStopDistance();
         nav.destination = leader.transform.position;
 
-        if (leader.GetComponent<Prey>().state == States.Repose && leader.GetComponent<Prey>().actualNode.transform.position == actualNode.transform.position)
+        if (leader.GetComponent<Prey>().state == States.Waiting && leader.GetComponent<Prey>().actualNode.transform.position == actualNode.transform.position)
         {
             if( isOnRangeToStop() ){
                 stop();
-                state = States.Repose;
+                state = States.Waiting;
             }
         }
     }
@@ -377,7 +374,7 @@ public class Prey : Dinosaur
         nav.stoppingDistance = 0;
         //nav.stoppingDistance = distanceToBite();
         nav.destination = actualFood.transform.position;
-        if (distanceFromDestination() <= distanceToBite())
+        if (DistanceFromDestination() <= distanceToBite())
         {
 
             nav.destination = transform.position;
@@ -413,7 +410,7 @@ public class Prey : Dinosaur
 
         if (satisfied())
         {
-            state = States.Repose;
+            state = States.Waiting;
             nav.stoppingDistance = travelStopDistance();
             this.GetComponent<DinasorsAnimationCorrector>().idle();
         }
@@ -466,9 +463,9 @@ public class Prey : Dinosaur
     {
         if (state != States.Following && 0 < hp)
         {
-            if (isMyLeader(l))
+            if (IsMyLeader(l))
             {
-                if (!isMe(leader))
+                if (!IsMe(leader))
                 {
                     state = States.Following;
                     order_followMe(l);	//Reply the message to others
@@ -484,15 +481,15 @@ public class Prey : Dinosaur
         if (priority == Priorities.Run)
             return;
 
-        if (state != States.Repose && 0 < hp)
+        if (state != States.Waiting && 0 < hp)
         {
-            if (isMyLeader(l))
+            if (IsMyLeader(l))
             {
-                if (!isMe(leader))
+                if (!IsMe(leader))
                 {
                     if (leader.GetComponent<Prey>().actualNode.transform.position == actualNode.transform.position)
                     {
-                        state = States.Repose;
+                        state = States.Waiting;
                     }
                     else state = States.Following;
                     order_stop(l);	//Reply the message to others
@@ -508,9 +505,9 @@ public class Prey : Dinosaur
 
         if (state != States.Reagruping && 0 < hp)
         {
-            if (isMyLeader(l))
+            if (IsMyLeader(l))
             {
-                if (!isMe(leader))
+                if (!IsMe(leader))
                 {
                     state = States.Reagruping;
                     nav.destination = Dispersal(l.transform.position);
@@ -527,9 +524,9 @@ public class Prey : Dinosaur
 
         if (state != States.Hunting && 0 < hp)
         {
-            if (isMyLeader(l))
+            if (IsMyLeader(l))
             {
-                if (!isMe(leader))
+                if (!IsMe(leader))
                 {
                     state = States.Hunting;
                     nav.destination = l.GetComponent<NavMeshAgent>().destination;
@@ -544,9 +541,9 @@ public class Prey : Dinosaur
     {
         if (leader != null && 0 < hp)
         {
-            if (isMyLeader(l))
+            if (IsMyLeader(l))
             {
-                if (!isMe(leader))
+                if (!IsMe(leader))
                 {
                     state = States.Hiding;
                     leader = null;
@@ -698,7 +695,7 @@ public class Prey : Dinosaur
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange * 2.5f);
         for (int i = 0; i < hitColliders.Length; i++)
         {
-            if (!isMe(hitColliders[i].gameObject))
+            if (!IsMe(hitColliders[i].gameObject))
             { //No me lo envio a mi
                 if (hitColliders[i].tag == "Tree")
                 {
@@ -709,7 +706,7 @@ public class Prey : Dinosaur
         GameObject[] ret = new GameObject[foodCounter];
         for (int i = 0; i < hitColliders.Length; i++)
         {
-            if (!isMe(hitColliders[i].gameObject))
+            if (!IsMe(hitColliders[i].gameObject))
             { //No me lo envio a mi
                 if (hitColliders[i].tag == "Tree")
                 {

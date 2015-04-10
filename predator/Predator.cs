@@ -4,9 +4,6 @@ using System.Collections.Generic;
 
 public class Predator : Dinosaur {
 
-	private bool isNeededRun = false;
-	public GameObject actualFood;
-	
 	
 	// Use this for initialization
 	void Start () {
@@ -49,6 +46,8 @@ public class Predator : Dinosaur {
 
         actualNode = getActualPathNode();
 
+
+        priority = priorities();
         memorize();
 
 
@@ -78,7 +77,7 @@ public class Predator : Dinosaur {
             }
 
 			//LEADER BEHAVIOR 
-			if ( isMyLeader(gameObject) ) {
+			if ( IsMyLeader(gameObject) ) {
 				
 				//senseForSomething();
 				if (state == States.Searching) {			//Entra en estado para buscar comida
@@ -100,7 +99,11 @@ public class Predator : Dinosaur {
 					////Debug.Log("Comiendo...");
 					behavior_leader_Eating();
 					//Debug.Log("LEader eating");
-				}
+                }
+                else if (state == States.Waiting && priority == Priorities.Eat)
+                {
+                    state = States.Searching;
+                }
 				
 				
 				
@@ -109,7 +112,7 @@ public class Predator : Dinosaur {
 				if ( state == States.Following ){			//Seguir al lider
 					behavior_follower_following();
 					
-				}else if ( state == States.Repose ){		//Esperar a que el lider tome una decicion
+				}else if ( state == States.Waiting ){		//Esperar a que el lider tome una decicion
 					behavior_follower_waiting();
 					
 				}else if ( state == States.Reagruping ){	
@@ -184,7 +187,7 @@ public class Predator : Dinosaur {
         }
 
 		nav.destination = actualFood.transform.position;
-		if( distanceFromDestination() <= distanceToBite() ){
+		if( DistanceFromDestination() <= distanceToBite() ){
 			nav.destination = transform.position;
 			transform.LookAt (actualFood.transform);
 			if (actualFood.GetComponent<Prey> ().hp < 0) {
@@ -268,7 +271,7 @@ public class Predator : Dinosaur {
 		nav.stoppingDistance = 0;
 		//nav.stoppingDistance = distanceToBite();
 		nav.destination = actualFood.transform.position;
-		if (distanceFromDestination () <= distanceToBite ()) {
+		if (DistanceFromDestination () <= distanceToBite ()) {
 			
 			nav.destination = transform.position;
 			if (actualFood.GetComponent<Prey> ().hp < 0) {
@@ -335,8 +338,8 @@ public class Predator : Dinosaur {
 	///////////////////////////////////////////////////////////////
 	void LeaderSaysFollowMe( GameObject l ){
 		if (state != States.Following && 0 < hp ) {
-			if ( isMyLeader(l) ) {
-				if( !isMe(leader) ){
+			if ( IsMyLeader(l) ) {
+				if( !IsMe(leader) ){
 					state = States.Following;
 					order_followMe(l);	//Reply the message to others
 				}
@@ -346,10 +349,11 @@ public class Predator : Dinosaur {
 	
 	
 	void LeaderSaysStop( GameObject l ){
-		if (state != States.Repose  && 0 < hp  ) {
-			if ( isMyLeader(l) ) {
-				if( !isMe(leader) ){
-                    state = States.Repose;
+        if (state != States.Waiting && 0 < hp)
+        {
+			if ( IsMyLeader(l) ) {
+				if( !IsMe(leader) ){
+                    state = States.Waiting;
 					order_stop(l);	//Reply the message to others
 				}
 			}
@@ -358,8 +362,8 @@ public class Predator : Dinosaur {
 	
 	void LeaderSaysReagrupate( GameObject l ){
 		if (state != States.Reagruping && 0 < hp ) {
-			if ( isMyLeader(l) ) {
-				if( !isMe(leader) ){
+			if ( IsMyLeader(l) ) {
+				if( !IsMe(leader) ){
 					state = States.Reagruping;
 					nav.destination = Dispersal( l.transform.position );
 					order_reagrupate(l);	//Reply the message to others
@@ -370,8 +374,8 @@ public class Predator : Dinosaur {
 	
 	void LeaderSaysHunt( GameObject l ){
 		if (state != States.Hunting && 0 < hp ) {
-			if ( isMyLeader(l) ) {
-				if( !isMe(leader) ){
+			if ( IsMyLeader(l) ) {
+				if( !IsMe(leader) ){
 					state = States.Hunting;
 					nav.destination = l.GetComponent<NavMeshAgent>().destination;
 					order_hunt(l);	//Reply the message to others
@@ -471,7 +475,7 @@ public class Predator : Dinosaur {
 		Collider[] hitColliders = Physics.OverlapSphere(transform.position, comRange*2.5f);
 		for (int i = 0; i < hitColliders.Length; i++) 
         {
-			if( !isMe( hitColliders[i].gameObject ) ){ //No me lo envio a mi
+			if( !IsMe( hitColliders[i].gameObject ) ){ //No me lo envio a mi
 				if (hitColliders [i].GetComponent<Prey> () != null )
                 {
                     preys.Add(hitColliders[i].gameObject);
@@ -481,7 +485,16 @@ public class Predator : Dinosaur {
 		}
         return preys.ToArray();
 	}
-	
+    private Priorities priorities()
+    {
+
+        if (hungry())
+        {
+            return Priorities.Eat;
+        }
+        return Priorities.Obey;
+    }
+
 	
 	/*
 	 * Retorna la mejor presa posible
