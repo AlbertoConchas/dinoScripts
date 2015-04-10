@@ -175,7 +175,7 @@ public class LeaderChoosing : MonoBehaviour {
         List<GameObject> myHerd = me.herd;
 
         // solo mezclar manadas cuando yo soy lider
-        if (me.leader!=null && me.leader.GetInstanceID() == gameObject.GetInstanceID()) 
+        if (me.getLeader() != null && me.getLeader().GetInstanceID() == gameObject.GetInstanceID()) 
         {
             // filtrar quienes son los nuevos dinos
             foreach (GameObject friend in myHerd) 
@@ -191,7 +191,7 @@ public class LeaderChoosing : MonoBehaviour {
                     Dinosaur newDino = newDinoObject.GetComponent<Dinosaur>();
 
                     // el dino nuevo es lider de su manada y podemos unir manadas!
-                    if (newDino.leader != null && newDino.leader.GetInstanceID() == newDinoObject.GetInstanceID()) 
+                    if (newDino.getLeader() != null && newDino.getLeader().GetInstanceID() == newDinoObject.GetInstanceID()) 
                     {
 
                         // agregar dinos externos y lider externo a mi manada
