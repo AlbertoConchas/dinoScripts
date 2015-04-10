@@ -173,8 +173,6 @@ public class LeaderChoosing : MonoBehaviour {
     {
         Dinosaur me = GetComponent<Dinosaur>();
         List<GameObject> myHerd = me.herd;
-        int lid = me.leader.GetInstanceID();
-        int id = gameObject.GetInstanceID();
 
         // solo mezclar manadas cuando yo soy lider
         if (me.leader!=null && me.leader.GetInstanceID() == gameObject.GetInstanceID()) 
