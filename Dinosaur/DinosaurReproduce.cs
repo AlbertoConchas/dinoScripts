@@ -122,24 +122,45 @@ public class DinosaurReproduce : MonoBehaviour
     private void crossover()
     {
         String path = "";
-        if (GetComponent<Dinosaur>().name == "stegosaurus")
+        //Depredator
+        if (GetComponent<Dinosaur>().name == "carnotaurus")
         {
-            path = "Assets/My Assets/stegosaurus.prefab";
+            path = "Assets/My Assets/Prefab/Depredator/carnotaurus.prefab";
         }else
-            if (GetComponent<Dinosaur>().name == "velociraptor")
+            if (GetComponent<Dinosaur>().name == "spinosaurus")
             {
-                path = "Assets/My Assets/velociraptor.prefab";
+                path = "Assets/My Assets/Prefab/Depredator/spinosaurus.prefab";
             }
             else
                 if (GetComponent<Dinosaur>().name == "tiranosaurus")
                 {
-                    path = "Assets/My Assets/tiranosaurus.prefab";
+                    path = "Assets/My Assets/Prefab/Depredator/tiranosaurus.prefab";
                 }
                 else
-                    if (GetComponent<Dinosaur>().name == "ankylosaurus")
+                    if (GetComponent<Dinosaur>().name == "velociraptor")
                     {
-                        path = "Assets/My Assets/ankylosaurus.prefab";
+                        path = "Assets/My Assets/Prefab/Depredator/velociraptor.prefab";
                     }
+                    else //Prey
+                        if (GetComponent<Dinosaur>().name == "ankylosaurus")
+                        {
+                            path = "Assets/My Assets/Prefab/Prey/ankylosaurus.prefab";
+                        }
+                        else
+                            if (GetComponent<Dinosaur>().name == "parasaurolophus")
+                            {
+                                path = "Assets/My Assets/Prefab/Prey/parasaurolophus.prefab";
+                            }
+                            else
+                                if (GetComponent<Dinosaur>().name == "stegosaurus")
+                                {
+                                    path = "Assets/My Assets/Prefab/Prey/stegosaurus.prefab";
+                                }
+                                else
+                                    if (GetComponent<Dinosaur>().name == "triceratops")
+                                    {
+                                        path = "Assets/My Assets/Prefab/Prey/triceratops.prefab";
+                                    }
                    
 
 

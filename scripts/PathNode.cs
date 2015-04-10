@@ -154,7 +154,7 @@ public class PathNode : MonoBehaviour {
 
 	private void plantTree(){
 		Vector3 randPos = randomPosition();
-		GameObject g = (GameObject)Instantiate(Resources.LoadAssetAtPath("Assets/My Assets/tree.prefab", typeof(GameObject)), randPos , Quaternion.identity);
+		GameObject g = (GameObject)Instantiate(Resources.LoadAssetAtPath("Assets/My Assets/Prefab/tree.prefab", typeof(GameObject)), randPos , Quaternion.identity);
 		g.name = "tree";
         g.transform.parent = forest.transform;
 	}

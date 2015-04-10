@@ -27,6 +27,20 @@ public class DinasorsAnimationCorrector : MonoBehaviour {
 			type = gameObject.name;
 		}
 
+        //Depredator
+        if (type == "carnotaurus")
+        {
+            walk = 1f;
+            run = 4f;
+        }
+
+        if (type == "spinosaurus")
+        {
+            walk = 1f;
+            run = 4f;
+        }
+
+
 		if (type == "tiranosaurus") {
 			walk = 1.5f;
 			run = 4f;
@@ -37,15 +51,30 @@ public class DinasorsAnimationCorrector : MonoBehaviour {
 			run = 4f;
 		}
 
+        //Prey
 		if (type == "ankylosaurus") {
 			walk = .31f;
 			run = 1.3f;
 		}
 
+        if (type == "parasaurolophus")
+        {
+            walk = .31f;
+            run = 1.3f;
+        }
+
+
 		if (type == "stegosaurus") {
 			walk = .55f;
 			run = 1.5f;
 		}
+
+
+        if (type == "triceratops")
+        {
+            walk = .55f;
+            run = 1.5f;
+        }
 
 	
 	}
