@@ -63,7 +63,7 @@ public class LeaderChoosing : MonoBehaviour {
     /**
      * Consegui ser lider, crea la luz encima de el
      **/
-    private void becomeLeader()
+    public void becomeLeader()
     {
 
         //Crea el objeto al que se le agregara la luz
@@ -98,7 +98,7 @@ public class LeaderChoosing : MonoBehaviour {
     /*
      * Otro dino me quito el liderazgo
      */
-    private void unbecomeLeader()
+    public void unbecomeLeader()
     {
         //encuentra el objeto al que se le agregara la luz
         Transform t = gameObject.transform.Find("leaderLigth");

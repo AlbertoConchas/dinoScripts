@@ -131,7 +131,7 @@ public class Predator : Dinosaur {
     void behavior_reproduce()
     {
         GetComponent<DinosaurReproduce>().findPartner();
-        state = States.Searching;
+     
     }
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

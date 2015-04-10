@@ -35,24 +35,39 @@ public class DinosaurReproduce : MonoBehaviour
                 //If is female
                 if (GetComponent<Dinosaur>().female && !dino.GetComponent<Dinosaur>().female)
                 {
-                    partner = dino;
+                    posiblePartner.Add(dino);
                 }
                 else
                 {
                     //If is a male
                     if (!GetComponent<Dinosaur>().female && dino.GetComponent<Dinosaur>().female)
                     {
-                        partner = dino;
+                        posiblePartner.Add(dino);
                     }
                 }
             }
         }
 
+        if (posiblePartner.Count >= 1)
+        {
+            int num = random.Next(0, posiblePartner.Count);
+            partner= posiblePartner[num];
+
+        }
+        else {
+            partner = null;
+        }
+
+
         if (partner != null)
         {
+            gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Searching;
             startReproduction();
         }
-        else
+        else {
+            gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Searching;
+        }
+
             return;
     }
 
@@ -71,7 +86,7 @@ public class DinosaurReproduce : MonoBehaviour
 
     private void mutation()
     { 
-        //Genotipe
+        //Genotipe Uniform
        
 
        //Salud de la entidad
@@ -171,7 +186,7 @@ public class DinosaurReproduce : MonoBehaviour
                                                                            (float)(0.5 * child.GetComponent<Dinosaur>().transform.localScale.y),
                                                                             (float)(0.5 * child.GetComponent<Dinosaur>().transform.localScale.z));
 
-        //Recombination
+        //Recombination Floating-Point Arithmetic Recombination
 
         //Salud de la entidad
         child.GetComponent<Dinosaur>().hp = (a * GetComponent<Dinosaur>().hp) + ((1 - a) * partner.GetComponent<Dinosaur>().hp);
@@ -208,21 +223,37 @@ public class DinosaurReproduce : MonoBehaviour
         List<GameObject> momHerd = GetComponent<Dinosaur>().herd;
         List<GameObject> childHerd = new List<GameObject>(momHerd);
 
-        // agregar madre al herd del hijo
+        //Agregar al hijo la manada de la madre
         child.GetComponent<Dinosaur>().herd = childHerd;
         child.GetComponent<Dinosaur>().herd.Add(gameObject);
 
 
-        // agregar 
+        // Agrega al hijo a la cada miembro de la manada
         foreach (GameObject o in momHerd)
         {
             o.GetComponent<Dinosaur>().herd.Add(child);
         }
 
+        //Agregar a la manada de la mama el hijo
         momHerd.Add(child);
 
-        child.GetComponent<Dinosaur>().setLeader(GetComponent<Dinosaur>().getLeader()); 
+        //Si el hijo es mejor que el lider actual
+        if (child.GetComponent<Dinosaur>().getLeadershipStat() > GetComponent<Dinosaur>().getLeader().GetComponent<Dinosaur>().getLeadershipStat())
+        {
+            //Soy mi propio lider y destrono al anterior
+            child.GetComponent<Dinosaur>().setLeader(child);
+            GetComponent<Dinosaur>().getLeader().GetComponent<LeaderChoosing>().unbecomeLeader();
+            child.GetComponent<LeaderChoosing>().becomeLeader();
+                        
+            //Informarlo a la manada
+            foreach (GameObject o in child.GetComponent<Dinosaur>().herd)
+            {
+                o.GetComponent<Dinosaur>().setLeader(child);
+            }
 
+
+        }
+        
     }
 
     private float generateRandom(){
