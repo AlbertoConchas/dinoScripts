@@ -198,6 +198,9 @@ public class DinosaurReproduce : MonoBehaviour
             child.GetComponent<Dinosaur>().female = false;
         }
 
+        //La energia de la mama decremente despues de dar a luz
+
+        GetComponent<Dinosaur>().stamina = GetComponent<Dinosaur>().stamina - 5;
 
         List<GameObject> momHerd = GetComponent<Dinosaur>().herd;
         List<GameObject> childHerd = new List<GameObject>(momHerd);
