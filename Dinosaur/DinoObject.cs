@@ -86,7 +86,7 @@ namespace Assets.My_Assets
         /// <summary>
         /// Inidca quien es el lider
         /// </summary>
-        protected GameObject leader;
+        public GameObject leader;
 
         /// <summary>
         // sexo del dino (true si es muchachita)
@@ -96,10 +96,11 @@ namespace Assets.My_Assets
         /// <summary>
         // lista que contiene la manada a la que se es parte
         /// </summary>
-        /// 
-
-
         public List<GameObject> herd = new List<GameObject>();
+
+        public float mutation;
+
+        public float crossover;
 
         public enum States
         {
@@ -124,8 +125,6 @@ namespace Assets.My_Assets
             Vejez
         }
         #endregion
-
-
 
         #region Funciones de metabolismo
         /// <summary>
@@ -294,19 +293,31 @@ namespace Assets.My_Assets
         /// </summary>
         protected void InitValue()
         {
+
             //Propiedades fijas
             hp = 100f;
             stamina = 100f;
-            comRange = 10;
-            lifetime = Random.Range(0, 500); ;
+            lifetime = Random.Range(0, 500);
             isNeededRun = false;
             isLeader = false;
+            mutation = 0.3f;
+            crossover = 0.5f;
 
             //Propiedades variables
+            comRange = Random.Range(8, 12);
             flesh = Random.Range(300, 700);
             speed = Random.Range(6, 10);
             maxLifeTime = Random.Range(540, 720);
             attack = Random.Range(6, 16);
+
+            if (Random.Range(0, 100) < 50)
+            {
+                female = true;
+            }
+            else
+            {
+                female = false;
+            }
 
             //Fija los parametros iniciales en torno a la escala
             comRange = (int)(comRange * ((float)transform.localScale.x / 0.3));
@@ -377,7 +388,6 @@ namespace Assets.My_Assets
             }
             else
             {
-
                 actualFood.GetComponent<Prey>().flesh -= (attack - actualFood.GetComponent<Prey>().defense) * Time.deltaTime;
                 if (stamina < 100f)
                 {
@@ -389,17 +399,14 @@ namespace Assets.My_Assets
                 }
             }
         }
-
         #endregion
 
         #region Comunicacion
-        ///TODO: Agrregar comunicacion
-        ///
-        /*
-     * Funcion para enviar a todos los objetos cercanos
-     * string Messaage: Funcion que sera ejecutada en los objetos encontrados
-     * object obj: Parametros para enviar a esa funcion
-     */
+        /// <summary>
+        /// Funcion para enviar a todos los objetos cercanos
+        /// </summary>
+        /// <param name="message">Funcion que sera ejecutada en los objetos encontrados</param>
+        /// <param name="obj">Parametros para enviar a esa funcion</param>
         public void BroadCast(string message, object obj)
         {
             herd.RemoveAll(item => item == null);
@@ -415,9 +422,7 @@ namespace Assets.My_Assets
 
                 }
             }
-
         }
-
         #endregion
     }
 }

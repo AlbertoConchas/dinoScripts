@@ -21,8 +21,6 @@ public class Prey : Dinosaur
         flesh = 500f;
         updateHerd<Prey>();
 
-        //  state = States.Reproduce;
-
         state = States.ChoosingLeader;
         //Fija los parametros iniciales en torno a la escala
         comRange = (int)(comRange * ((float)transform.localScale.x / 0.3));
@@ -42,13 +40,16 @@ public class Prey : Dinosaur
         {
             GetComponent<LeaderChoosing>().choose();
         }
+        
         StartCoroutine("preyGrow");
+
     }
 
 
     // Update is called once per frame	
     void Update()
     {
+
         if (!metabolism())
             return;
         if (runningTime > 0 && priority == Priorities.Run)
@@ -211,7 +212,7 @@ public class Prey : Dinosaur
     void behavior_reproduce()
     {
         GetComponent<DinosaurReproduce>().findPartner();
-        state = States.Searching;
+      
     }
 
 
