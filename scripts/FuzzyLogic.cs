@@ -1,8 +1,16 @@
 using UnityEngine;	
 using System;
+using Assets.My_Assets.dinoScripts;
 
 public class FuzzyLogic : MonoBehaviour{
 
+
+
+
+	public Dinosaur.Priorities calPriority(double maxStamina,double maxLifetime,double stamina,double lifetime){
+
+		return 0;
+	}
 
 	/*
 	 * Calcula probabilidades difusas
@@ -17,7 +25,7 @@ public class FuzzyLogic : MonoBehaviour{
 			double[] error = new double[]{};
 			return error;
 		}
-
+	
 		//Prepara variables
 		double[] ps = new double[G.GetLength(1)];
 		double comidaTotal, rivalesTotal, companerosTotal;
@@ -214,6 +222,83 @@ public class FuzzyLogic : MonoBehaviour{
 		int y = (int)( Math.Round(x,1) * 10 ); 
 		//double[] fit = new double[] {0,0,0,0,.2,.4,.6,.8,1,.7,.5};
 		double[] fit = new double[] {0,0,0,0,0,0,.2,.4,.6,.8,1};
+		return fit[y];
+	}
+
+	//STAMINA
+	protected double staminaBaja( double x , double maxSta){//  ¯¯¯¯¯¯\____
+		double stam=(x*100)/maxSta;//porcentaje de stamina
+		if(stam>=0 && stam<30){
+			return 1;
+		}else if(stam>=30 && stam<70){
+			return (70-stam)/40;
+		}else{
+			return 0;
+		}
+	}
+	protected double staminaAlta( double x, double maxSta){ // _____/¯¯¯¯¯
+		double stam=(x*100)/maxSta;//porcentaje de stamina
+		if(stam>=0 && stam<30){
+			return 0;
+		}else if(stam>=30 && stam<70){
+			return (stam-30)/40;
+		}else{
+			return 1;
+		}
+
+	}
+   //ETAPAS DE VIDA  
+	protected double juventud( double x ,double maxLifetime ){  //  ¯¯¯¯¯¯\____
+		double life=(x*100)/maxLifetime;//porcentaje de stamina
+		if(life>=0 && life<20){
+			return 1;
+		}else if(life>=20 && life<40){
+			return (40-life)/30;
+		}else{
+			return 0;
+		}
+	}  
+	protected double adultez( double x,double maxLifetime ){ //      ___/¯¯¯¯\___
+		double life=(x*100)/maxLifetime;//porcentaje de stamina
+		if(life>=0 && life<20){
+			return 0;
+		}else if(life>=20 && life<40){
+			return (life-20)/20;
+		}else if (life >=40 && life <60){
+			return 1;
+		}else if (life >=60 && life <80){
+			return (80-life)/20;
+		}else{
+			return 0;
+		}
+	}
+	protected double vejez( double x,double maxLifetime ){ // _____/¯¯¯¯¯
+		double life=(x*100)/maxLifetime;//porcentaje de stamina
+		if(life>=0 && life<60){
+			return 0;
+		}else if(life>=60 && life<80){
+			return (life-60)/20;
+		}else{
+			return 1;
+		}
+	}
+	//PRIORIDADES
+	protected double correr( double x ){  //  ¯¯¯¯¯¯\____ 
+		int y = (int)( Math.Round(x,1) * 10 ); 
+		//double[] fit = new double[] {0,.2,.4,.6,.8,1,.8,.6,.4,.2,0};
+		double[] fit = new double[] {1,1,1,.7,.4,.1,0,0,0,0,0};
+		return fit[y];
+	}
+	protected double reproducirse( double x ){ // _/¯\_
+		int y = (int)( Math.Round(x,1) * 10 ); 
+		//double[] fit = new double[] {0,.2,.4,.6,.8,1,.8,.6,.4,.2,0};
+		double[] fit = new double[] {0,0,0,.4,.7,1,.7,.4,0,0,0};
+		return fit[y];
+	}
+	protected double comer( double x ){// _____/¯¯¯¯¯
+		int y = (int)( Math.Round(x,1) * 10 ); 
+		//double[] fit = new double[] {0,.2,.4,.6,.8,1,.8,.6,.4,.2,0};
+		double[] fit = new double[] {0,0,0,0,0,.1,.4,.7,1,1,1};
 		return fit[y];
 	}
 }
