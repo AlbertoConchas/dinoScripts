@@ -41,7 +41,7 @@ public class Predator : Dinosaur {
 	// Update is called once per frame	
 	void Update () {
 
-		if (!metabolism()) 
+		if (!Metabolism()) 
 			return;
 
         actualNode = getActualPathNode();
@@ -387,7 +387,7 @@ public class Predator : Dinosaur {
 	
 	/**
 	 *	Funciones Biologicas de consumir energia
-	 */
+	 *
 	private bool metabolism(){
 		if ( state == States.Die ){
 			if ( this.flesh <= 0 )
@@ -407,7 +407,7 @@ public class Predator : Dinosaur {
 			return false;
 		}
 		return true;
-	}
+	}*/
 	
 	
 	//Mueve las estadisticas del enemigo y del agente

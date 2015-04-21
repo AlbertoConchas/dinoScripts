@@ -9,6 +9,7 @@ public class Prey : Dinosaur
     private HashSet<Node> closed;//A* pathfinding
     private PathNode lastNode;
     public int runningTime = 200;
+	private FuzzyLogic fLogic;
     //Enum Para los estados del seguidor
 
 
@@ -16,6 +17,10 @@ public class Prey : Dinosaur
     // Use this for initialization
     void Start()
     {
+
+		if( fLogic == null )
+			setFuzzyLogic();
+
         base.start();//Init Dinosaur
 
         flesh = 500f;
@@ -50,17 +55,22 @@ public class Prey : Dinosaur
     void Update()
     {
 
-        if (!metabolism())
+		if (!Metabolism())
             return;
-        if (runningTime > 0 && priority == Priorities.Run)
+
+        
+		if (runningTime > 0 && priority == Priorities.Run)
         {
             runningTime--;
             return;
         }
 
         actualNode = getActualPathNode();
-        priority = priorities();
+       // priority = priorities();
+		priority = fLogic.calPriority (actualNode, 100, maxLifeTime, stamina, lifetime);
         memorize();
+
+		//Debug.Log (fLogic.calPriority(actualNode,100,maxLifeTime,stamina,lifetime));
 
         if (priority == Priorities.Run)
         {
@@ -116,6 +126,7 @@ public class Prey : Dinosaur
         }
         else if (state != States.ChoosingLeader)
         {
+
 
             /////////////////////////////////////////////////////////REPRODUCE
             
@@ -591,7 +602,7 @@ public class Prey : Dinosaur
     }
     /**
      *	Funciones Biologicas de consumir energia
-     */
+     *
     private bool metabolism()
     {
         float factor = 1f;
@@ -624,7 +635,7 @@ public class Prey : Dinosaur
             return false;
         }
         return true;
-    }
+    }*/
 
 
     //Mueve las estadisticas del enemigo y del agente
@@ -776,5 +787,27 @@ public class Prey : Dinosaur
             yield return new WaitForSeconds(1);
         }
     }
-
+	private void setFuzzyLogic(){
+		fLogic = GameObject.Find ("Global").GetComponent<FuzzyLogic> ();
+	}
+	/*
+	 * FormatData
+	 * Le da formato a la informacion de los nodos para procesarla
+	 */
+	private double[,] formatData(PathNode actualNode, GameObject[] neighbors){
+		double[,] nodesData = new double[ 3 , neighbors.Length + 1 ];
+		
+		//Agrega los vecinos para ser procesados
+		for (int i = 0; i < neighbors.Length; i++) {
+			nodesData[0,i] = neighbors[i].GetComponent<PathNode>().getPlants();
+			nodesData[1,i] =  actualNode.GetComponent<PathNode>().getPredators();
+			nodesData[2, i] = actualNode.GetComponent<PathNode>().getPrays();
+		}
+		//Agrega el nodo actual para ser procesado tambien
+		nodesData[0, neighbors.Length ] = actualNode.getPlants();
+		nodesData[1, neighbors.Length ] = actualNode.getPredators();
+		nodesData[2, neighbors.Length] = actualNode.getPrays();
+		
+		return nodesData;
+	}
 }
