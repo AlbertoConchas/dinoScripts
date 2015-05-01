@@ -43,6 +43,10 @@ public class Dinosaur : DinoObject{
     private bool requestResponded;
     private GameObject tempLeader;
 
+    //Search
+    private BinaryHeap<Node> open;//A* pathfinding
+    private HashSet<Node> closed;//A* pathfinding
+
     public enum Priorities {Eat, Obey, Reproduce, Run};
 
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

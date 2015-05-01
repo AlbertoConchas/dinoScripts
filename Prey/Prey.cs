@@ -236,7 +236,10 @@ public class Prey : Dinosaur
         Vector3 foodPosition = searchForFood();
         state = States.Following;
         order_followMe(gameObject);
-        nav.destination = foodPosition;
+        if (!(foodPosition == actualNode.transform.position))
+        {
+            nav.destination = foodPosition;
+        }
     }
 
     void behavior_leader_following()
