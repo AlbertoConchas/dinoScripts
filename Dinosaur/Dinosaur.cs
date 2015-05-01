@@ -28,6 +28,12 @@ public class Dinosaur : DinoObject{
 	
     //Memory
     protected Dictionary<Vector3, Remembrance> memory;//The memorized nodes
+    
+    //Search
+    private BinaryHeap<Node> open;//A* pathfinding
+    private HashSet<Node> closed;//A* pathfinding
+    protected PathNode lastNode;
+
     protected DateTime last_update;
     private static int tw = 5;//Time lapse in seconds that have to be present since last update in order to store information in memory
 
@@ -216,7 +222,7 @@ public class Dinosaur : DinoObject{
     /// <returns>Node converted</returns>
     protected Node toNode(PathNode n)
     {
-        Node nn = new Node(n.transform.position, n.getFertility(), n.getPlants(), n.getPredators(), 0, 0);
+        Node nn = new Node(n.transform.position, n.getFertility(), n.getPlants(), n.getPrays(), n.getPredators(), 0, 0);
         nn.setF(nn.getFertility());
         return nn;
     }
@@ -274,8 +280,8 @@ public class Dinosaur : DinoObject{
         for (int i = 0; i < nbh.Length; i++)
         {
             p = nbh[i].GetComponent<PathNode>();
-            //(Vector3 position, float fertility, int plants, int predators, int f, int g)
-            neighbourhood[i] = new Node(p.transform.position, p.getFertility(), p.getPlants(), p.getPredators(), 0, 1);
+            
+            neighbourhood[i] = new Node(p.transform.position, p.getFertility(), p.getPlants(), p.getPrays(), p.getPredators(), 0, 1);
             neighbourhood[i].setF(getH(neighbourhood[i]));
         }
         return neighbourhood;
@@ -291,6 +297,43 @@ public class Dinosaur : DinoObject{
         float h = n.getFertility();
         return h;
     }
+
+    protected Vector3 searchForFood()
+    {
+        //init data structures if needed
+        if (open == null)
+        {
+            open = new BinaryHeap<Node>(new NodeComparator());
+            closed = new HashSet<Node>(new NodeEqualityComparer());
+        }
+
+        Node acNode = toNode(actualNode);
+        closed.Add(acNode);
+        if (isGoal(acNode))
+        {
+            open.Clear();
+            closed.Clear();
+            return acNode.getPosition();
+        }
+        Node[] neighbors = expand();//Equivalent to expand step on A* algorithm
+        foreach (Node n in neighbors)
+        {
+            if (isGoal(n))
+            {
+                //Restart if Goal
+                open.Clear();
+                closed.Clear();
+                return n.getPosition();
+            }
+            if (!closed.Contains(n))
+            {
+                open.Insert(n);
+            }
+        }
+        return open.RemoveRoot().getPosition();
+    }
+
+    protected abstract bool isGoal(Node node);
 
     //=============Memory functions=================
     protected void memorize()

@@ -16,28 +16,31 @@ namespace Assets.My_Assets.dinoScripts.search
         private Node parent;
         private float fertility;
         private int plants;
-        private int other_species;//Number of predator for preys, number of preys for other_species.
+        private int preys;
+        private int predators;
         private float f;//f(x) in A* algorithm
         private int g;//g(x) in A* algorithm
 
-        public Node(Vector3 position, float fertility, int plants, int other_species, float f, int g)
+        public Node(Vector3 position, float fertility, int plants, int preys, int predators, float f, int g)
         {
             this.position = position;
             this.parent = null;
             this.fertility = fertility;
             this.plants = plants;
-            this.other_species = other_species;
+            this.preys = preys;
+            this.predators = predators;
             this.f = f;
             this.g = g;
         }
 
-        public Node(Vector3 position, Node parent,float fertility, int plants, int other_species, float f, int g)
+        public Node(Vector3 position, Node parent, float fertility, int plants, int preys, int predators, float f, int g)
         {
             this.position = position;
             this.parent = parent;
             this.fertility = fertility;
             this.plants = plants;
-            this.other_species = other_species;
+            this.preys = preys;
+            this.predators = predators; ;
             this.f = f;
             this.g = g;
         }
@@ -82,14 +85,24 @@ namespace Assets.My_Assets.dinoScripts.search
             this.plants = plants;
         }
 
-        public int getother_species()
+        public int getPreys()
         {
-            return other_species;
+            return preys;
         }
         
-        public void setother_species(int other_species)
+        public void setPreys(int preys)
         {
-            this.other_species = other_species;
+            this.preys = preys;
+        }
+
+        public int getPredators()
+        {
+            return predators;
+        }
+
+        public void setPredators(int predators)
+        {
+            this.predators = predators;
         }
 
         public float getF()
