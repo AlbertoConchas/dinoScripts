@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Assets.My_Assets
 {
-    public class DinoObject : MonoBehaviour
+    public abstract class DinoObject : MonoBehaviour
     {
         #region Propiedades
         /// <summary>
@@ -189,16 +189,8 @@ namespace Assets.My_Assets
         /// <summary>
         /// Muere el agente
         /// </summary>
-        protected void Die()
-        {
-            state = States.Die;
-            GetComponent<DinasorsAnimationCorrector>().die();
-            defense = 0;
-            if (IsMyLeader(gameObject) || isLeader == true)
-            {
-                Destroy(gameObject.transform.Find("leaderLigth").gameObject);
-            }
-        }
+        protected abstract void Die();
+
         #endregion
 
         #region Funciones de movimiento

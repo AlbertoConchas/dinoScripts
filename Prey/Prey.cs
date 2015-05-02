@@ -77,7 +77,7 @@ public class Prey : Dinosaur
         else
 			nav.speed = Velocidad(false);
 
-        //updateHerd<Prey>();
+        updateHerd<Prey>();
 
         if (state == States.Hiding || priority == Priorities.Run)
         {
@@ -114,7 +114,7 @@ public class Prey : Dinosaur
         // si el lider ya no existe o esta muerto y ademas no se esta seleccionando lider
         else if ((leader == null || leader.GetComponent<Prey>().state == Prey.States.Die) && state != States.ChoosingLeader)
         {
-			updateHerd<Prey>();
+			//updateHerd<Prey>();
             if (GetComponent<LeaderChoosing>() == null)
                 setLeader(gameObject);
             else
