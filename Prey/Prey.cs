@@ -31,7 +31,7 @@ public class Prey : Dinosaur
         //Inicializa el NavMeshAgent
         nav = GetComponent<NavMeshAgent>();
 
-        nav.speed = (float)((stamina / 100f) * speed) / 3;
+		nav.speed =Velocidad(false);
         /*if(isNeededRun)
             nav.speed = (float)((stamina/100f)*speed)*3;
         */
@@ -71,10 +71,10 @@ public class Prey : Dinosaur
 
         if (priority == Priorities.Run)
         {
-            nav.speed = (float)((stamina / 100f) * speed) * 3;
+			nav.speed =Velocidad(true);
         }
         else
-            nav.speed = (float)((stamina / 100f) * speed) / 3;
+			nav.speed = Velocidad(false);
 
         //updateHerd<Prey>();
 

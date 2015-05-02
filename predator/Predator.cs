@@ -21,9 +21,7 @@ public class Predator : Dinosaur {
 		//Inicializa el NavMeshAgent
 		nav = GetComponent<NavMeshAgent> ();
 		
-		nav.speed = (float)speed/3;
-		if(isNeededRun)
-			nav.speed = (float)speed*3;
+		nav.speed = Velocidad (isNeededRun);
 
 
         //Si no cuenta con eleccion de lider, el es el lider
@@ -53,6 +51,13 @@ public class Predator : Dinosaur {
 
 
         updateHerd<Predator>();
+		if (state == States.Hunting) {
+			isNeededRun = true;
+		} else {
+			isNeededRun = false;				
+	    }
+
+		nav.speed = Velocidad (isNeededRun);
         
         if ((leader == null || leader.GetComponent<Predator>().state == Predator.States.Die) && state != States.ChoosingLeader)
         {

@@ -48,7 +48,7 @@ public class FuzzyLogic : MonoBehaviour{
 				reproduceFuzzy[i]=regla2;
 			}
 		}
-		//Debug.Log (regla3+"  "+runFuzzy[1]+" "+run[1]);
+
 		//Max membership defuzzification method
 		int maxRun=0,maxEat=0,maxReproduce=0;
 
@@ -63,7 +63,8 @@ public class FuzzyLogic : MonoBehaviour{
 				maxReproduce=i;
 			}
 		}
-		//Debug.Log (runFuzzy[maxRun]+" "+eatFuzzy[maxEat]+" "+reproduceFuzzy[maxReproduce]);
+		Debug.Log (regla1);
+		Debug.Log (runFuzzy[maxRun]+" "+eatFuzzy[maxEat]+" "+reproduceFuzzy[maxReproduce]);
 		if (runFuzzy[maxRun] > 0) {
 			return Dinosaur.Priorities.Run;		
 		}else if (eatFuzzy[maxEat] > runFuzzy[maxRun] && eatFuzzy[maxEat] > reproduceFuzzy[maxReproduce] && eatFuzzy[maxEat] !=0){
