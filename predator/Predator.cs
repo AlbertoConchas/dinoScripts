@@ -193,14 +193,14 @@ public class Predator : Dinosaur {
         }
 
 		nav.destination = actualFood.transform.position;
-		if( DistanceFromDestination() <= distanceToBite() ){
+		if( DistanceFromDestination() <= DistanceToBite(false) ){
 			nav.destination = transform.position;
 			transform.LookAt (actualFood.transform);
 			if (actualFood.GetComponent<Prey> ().hp < 0) {
 				state = States.Eating;
 				this.GetComponent<DinasorsAnimationCorrector> ().eating();
 			}else {
-				biteEnemy();
+				BiteEnemy(false);
 			}
 		}
 	}
@@ -213,7 +213,7 @@ public class Predator : Dinosaur {
 			return;
 		}
 		
-		eatEnemy();
+		EatEnemy(false);
 		if ( actualFood.GetComponent<Prey>().flesh < 0){
 			this.GetComponent<DinasorsAnimationCorrector>().idle();
 			state = States.Searching;
@@ -277,14 +277,14 @@ public class Predator : Dinosaur {
 		nav.stoppingDistance = 0;
 		//nav.stoppingDistance = distanceToBite();
 		nav.destination = actualFood.transform.position;
-		if (DistanceFromDestination () <= distanceToBite ()) {
+		if (DistanceFromDestination () <= DistanceToBite (false)) {
 			
 			nav.destination = transform.position;
 			if (actualFood.GetComponent<Prey> ().hp < 0) {
 				state = States.Eating;
 				this.GetComponent<DinasorsAnimationCorrector> ().eating ();
 			} else {
-				biteEnemy ();
+				BiteEnemy (false);
 			}
 		}
 	}
@@ -297,7 +297,7 @@ public class Predator : Dinosaur {
 			return;
 		}
 		
-		eatEnemy();
+		EatEnemy(false);
 		if ( actualFood.GetComponent<Prey>().flesh < 0){
 			this.GetComponent<DinasorsAnimationCorrector>().idle();
 			state = States.Hunting;
@@ -390,62 +390,6 @@ public class Predator : Dinosaur {
 		}
 	}
 
-	
-	/**
-	 *	Funciones Biologicas de consumir energia
-	 *
-	private bool metabolism(){
-		if ( state == States.Die ){
-			if ( this.flesh <= 0 )
-				Destroy( gameObject );
-			return false;
-		}
-		if (0 < this.stamina) {	
-			this.stamina -= 0.000001;			
-		}
-		if (stamina <= 0) {
-			if ( 0 < this.hp ) {	
-				this.hp -= 0.001f;
-			}
-		}
-		if( this.hp <= 0){
-			die ();
-			return false;
-		}
-		return true;
-	}*/
-	
-	
-	//Mueve las estadisticas del enemigo y del agente
-	void eatEnemy(){
-		actualFood.GetComponent<Prey> ().flesh -= ((float)this.attack / (1f / Time.deltaTime))*0.6f;
-        //actualFood.GetComponent<Prey>().isNeededRun = true;
-		if ( this.stamina < 100f )
-			this.stamina += ((float)this.attack / (1f / Time.deltaTime));
-		else 
-			this.hp += ((float)this.attack / (1f / Time.deltaTime));
-	}
-	
-
-	
-	/**
-	 * Distancia Optima para atacar al enemigo actual
-	 */
-	float distanceToBite(){
-		return ((nav.radius) * transform.localScale.x * 1.3f) +
-			((actualFood.GetComponent<NavMeshAgent>().radius) * actualFood.transform.localScale.x * 1.3f);
-	}
-	
-	
-	/**
-	 * Funcion que inflige daño al enemigo
-	 */
-	void biteEnemy(){
-		actualFood.GetComponent<Prey> ().hp -= (this.attack / (1f / Time.deltaTime));
-	}
-	
-	
-	
 	
 	/**
 	 **Recive un arreglo de GameObject y regresa el mas cercano a la posicion actual

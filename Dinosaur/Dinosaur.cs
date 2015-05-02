@@ -9,17 +9,7 @@ using Assets.My_Assets.dinoScripts.Dinosaur;
 using Assets.My_Assets;
 
 public abstract class Dinosaur : DinoObject{
-   /* //public Transform m_Prey;
-    public float hp = 100f;			//Salud de la entidad*/
-   // public int np = 10;			//Nutricion aportada a quien se alimente de la entidad
-  /*  public int speed = 2;			//Velocidad de la entidad
-    public int comRange = 10;			//Rango de comunicacion
-    public double stamina = 100f;			//Resistencia (nesesaria para correr etc....)
-    public float lifetime = 10000f;		//Tiempo de vida
-    public float attack = 10f;			//Daño que realiza la entidad
-    public float flesh = 200f;
-	public bool female;
-    public States state;*/
+
     public float leadership;
 	public Priorities priority;
 	
@@ -43,9 +33,6 @@ public abstract class Dinosaur : DinoObject{
     private bool requestResponded;
     private GameObject tempLeader;
 
-    //Search
-    //private BinaryHeap<Node> open;//A* pathfinding
-    //private HashSet<Node> closed;//A* pathfinding
 
     public enum Priorities {Eat, Obey, Reproduce, Run};
 
@@ -106,28 +93,6 @@ public abstract class Dinosaur : DinoObject{
 
 
 
-    /*
- * Funcion para enviar a todos los objetos cercanos
- * string Messaage: Funcion que sera ejecutada en los objetos encontrados
- * object obj: Parametros para enviar a esa funcion
- *
-   public void BroadCast(string message, object obj)
-    {
-        herd.Remove(null);
-       	if(herd.Count>0)
-        foreach (GameObject dino in herd)
-        {
-            if (dino != null || dino.GetComponent<Dinosaur>().state != States.Die)
-            {
-				dino.SendMessage(message, (GameObject)obj);
-            }
-            else
-            {
-                //herd.Remove(dino);
-            }
-            
-        }
-    }*/
    public List<GameObject> getHerd() {
        return herd;
    }
@@ -149,26 +114,6 @@ public abstract class Dinosaur : DinoObject{
             }
         }
 
-        List<GameObject> dead = new List<GameObject>();
-
-        /*checar si hay alguien muerto y sacarlo de la manada*/
-        foreach(GameObject dino in herd)
-        {
-            if (inRangeHerd.Contains(dino) && dino.GetComponent<Dinosaur>().state == States.Die) 
-            {
-                dead.Add(dino);
-            }
-        }
-        if (dead.Count > 0) 
-        {
-            foreach (GameObject dino in dead)
-            {
-                herd.Remove(dino);
-            }
-            return true;
-        }
-
-
         if (herd.Count == 0) // no habia manada
         {
             herd = inRangeHerd;
@@ -181,7 +126,7 @@ public abstract class Dinosaur : DinoObject{
         {
             return false;
         }
-        else // hay mas dinos en la manada!
+        else // mas mas dinos en la manada!
         {
             GetComponent<LeaderChoosing>().mergeHerd(inRangeHerd);
             //herd = inRangeHerd;
@@ -208,13 +153,11 @@ public abstract class Dinosaur : DinoObject{
  protected  void stop()
   {
       nav.destination = transform.position;
-  }
-
-    protected override void Die()
-    {
+  }	
+	protected void Die(){
 		state = States.Die;
 		this.GetComponent<DinasorsAnimationCorrector>().die();
-        defense = 0;
+		//gameObject.GetComponent<PredatorLeaderChoosing> ().enabled = false;
 		if (IsMyLeader (gameObject)) 
         {
 			//LeaderSaysUnsetLeader (gameObject);
@@ -224,9 +167,6 @@ public abstract class Dinosaur : DinoObject{
                 Destroy(t.gameObject);
             }
 		}
-        isLeader = false;
-        leader = null;
-        herd = null;
 	}
 
     protected bool hungry()
