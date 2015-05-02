@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.My_Assets.dinoScripts.search;
 
 public class Predator : Dinosaur {
 
@@ -511,14 +512,11 @@ public class Predator : Dinosaur {
 		return getNeardest (g);
 	}
 
+    protected bool isGoal(Node node)
+    {
+        return (node.getPreys() > 0);
+    }
 
-
-	/*
-	*	Llama al modulo de logica difusa para encontrar el area mas conveniente para encontrr comida
-	*/
-	private Vector3 searchForFood(){
-		return GetComponent<PredatorSearchFood> ().searchForFood (transform.position);
-	}
 	/*
 	private bool hungry(){
 		if (stamina < 120f || hp < 100)

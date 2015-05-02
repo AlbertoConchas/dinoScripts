@@ -5,9 +5,6 @@ using Assets.My_Assets.dinoScripts.search;
 
 public class Prey : Dinosaur
 {
-    private BinaryHeap<Node> open;//A* pathfinding
-    private HashSet<Node> closed;//A* pathfinding
-    private PathNode lastNode;
     public int runningTime = 200;
 	private FuzzyLogic fLogic;
     //Enum Para los estados del seguidor
@@ -240,7 +237,10 @@ public class Prey : Dinosaur
         Vector3 foodPosition = searchForFood();
         state = States.Following;
         order_followMe(gameObject);
-        nav.destination = foodPosition;
+        if (!(foodPosition == actualNode.transform.position))
+        {
+            nav.destination = foodPosition;
+        }
     }
 
     void behavior_leader_following()
@@ -740,43 +740,10 @@ public class Prey : Dinosaur
         return g[Random.Range(0, g.Length - 1)];
     }
 
-
-    /*
-    *	Llama al modulo de logica difusa para encontrar el area mas conveniente para encontrr comida
-    */
-    private Vector3 searchForFood()
+    protected bool isGoal(Node node)
     {
-        //init data structures if needed
-        if (open == null)
-        {
-            open = new BinaryHeap<Node>(new NodeComparator());
-            closed = new HashSet<Node>(new NodeEqualityComparer());
-        }
-
-
-        closed.Add(toNode(actualNode));
-        if (actualNode.getPlants() > 0)
-        {
-            open = null;
-            closed = null;
-            return toNode(actualNode).getPosition();
-        }
-        Node[] neighbors = expand();//Equivalent to expand step on A* algorithm
-        foreach (Node n in neighbors)
-        {
-            if (n.getPlants() > 0)
-            {
-                return n.getPosition();
-            }
-            if (!closed.Contains(n))
-            {
-                open.Insert(n);
-            }
-        }
-        return open.RemoveRoot().getPosition();
+        return (node.getPlants() > 0);
     }
-
-
 
     IEnumerator preyGrow()
     {
