@@ -12,11 +12,22 @@ public class LeaderChoosing : MonoBehaviour {
     // Llamada a la votacion
     public void choose()
     {
-
+        tempLeader = null;
+        requestResponded = false;
         leadership = gameObject.GetComponent<Dinosaur>().getLeadershipStat();
 
         StartCoroutine(startElection());
         StartCoroutine(endElection());
+    }
+
+    /**
+     * Esperar un tiempo antes de empezar eleccion
+     **/
+    private IEnumerator startElection()
+    {
+        yield return new WaitForSeconds(.5f);
+        sendElectionMessage();
+        //StartCoroutine ("waitDeadTime");
     }
 
 
@@ -25,20 +36,17 @@ public class LeaderChoosing : MonoBehaviour {
      **/
     private void sendElectionMessage()
     {
-
         //por cada integrante en la manada (distinto de mi)
         foreach (GameObject dino in gameObject.GetComponent<Dinosaur>().getHerd())
         {
             //Si es mejor lider que yo
-            if (leadership < dino.GetComponent<Dinosaur>().leadership)
+            if (leadership < dino.GetComponent<Dinosaur>().leadership && dino.GetComponent<Dinosaur>().state != Dinosaur.States.Die)
             {
                 //Pidele que sea lider
                 dino.SendMessage("leadershipRequest", gameObject);
             }
         }
     }
-
-
 
     /**
      * Me solicitan ser lider
@@ -60,9 +68,68 @@ public class LeaderChoosing : MonoBehaviour {
     }
 
 
+
+
+
     /**
-     * Consegui ser lider, crea la luz encima de el
+     * Informar quien sera el lider
      **/
+    private void BroadcastLeadership(GameObject leader)
+    {
+        if(leader.GetComponent<Dinosaur>().state == Dinosaur.States.Die)
+        {
+            return;
+        }
+        if (tempLeader != null && tempLeader.GetInstanceID() == leader.GetInstanceID())
+        {
+            return;
+        }
+        if (tempLeader == null || tempLeader.GetComponent<Dinosaur>().leadership < leader.GetComponent<Dinosaur>().leadership)
+        {
+            tempLeader = leader;
+            gameObject.GetComponent<Dinosaur>().BroadCast("BroadcastLeadership", tempLeader);
+        }
+    }
+
+
+    
+
+
+    /**
+     * La eleccion termino, enviar quien sera el lider
+     **/
+    private IEnumerator endElection()
+    {
+        yield return new WaitForSeconds(3);
+        if (requestResponded == false)
+        {
+            tempLeader = gameObject;
+            BroadcastLeadership(gameObject);
+
+            //Espera 2 segundos por si alguien tambien quiere ser lider y tiene mejores capacidades que yo
+            yield return new WaitForSeconds(2);
+            GetComponent<Dinosaur>().setLeader(tempLeader);
+        }
+        else
+        {
+            yield return new WaitForSeconds(2);
+            GetComponent<Dinosaur>().setLeader(tempLeader);
+        }
+
+        // quita o pone la luz del lider
+        if (tempLeader.GetInstanceID() == gameObject.GetInstanceID())
+        {
+            becomeLeader();
+        }
+        else
+        {
+            unbecomeLeader();
+        }
+    }
+
+    /**
+    * Consegui ser lider, crea la luz encima de el
+    **/
     public void becomeLeader()
     {
 
@@ -103,70 +170,10 @@ public class LeaderChoosing : MonoBehaviour {
         //encuentra el objeto al que se le agregara la luz
         Transform t = gameObject.transform.Find("leaderLigth");
         if (t == null) return;
-        else 
+        else
         {
             Destroy(t.gameObject);
         }
-    }
-
-    /**
-     * Informar quien sera el lider
-     **/
-    private void BroadcastLeadership(GameObject leader)
-    {
-        if (tempLeader != null && tempLeader.GetInstanceID() == leader.GetInstanceID())
-        {
-            return;
-        }
-        if (tempLeader == null || tempLeader.GetComponent<Dinosaur>().leadership < leader.GetComponent<Dinosaur>().leadership)
-        {
-            tempLeader = leader;
-            gameObject.GetComponent<Dinosaur>().BroadCast("BroadcastLeadership", tempLeader);
-        }
-    }
-
-
-    /**
-     * Esperar un tiempo antes de empezar eleccion
-     **/
-    private IEnumerator startElection()
-    {
-        yield return new WaitForSeconds(.5f);
-        sendElectionMessage();
-        //StartCoroutine ("waitDeadTime");
-    }
-
-
-    /**
-     * La eleccion termino, enviar quien sera el lider
-     **/
-    private IEnumerator endElection()
-    {
-        yield return new WaitForSeconds(3);
-        if (requestResponded == false)
-        {
-            BroadcastLeadership(gameObject);
-
-            //Espera 2 segundos por si alguien tambien quiere ser lider y tiene mejores capacidades que yo
-            yield return new WaitForSeconds(2);
-            if (tempLeader == null)
-                tempLeader = gameObject;
-            GetComponent<Dinosaur>().setLeader(tempLeader);
-            if (tempLeader.GetInstanceID() == gameObject.GetInstanceID() && !requestResponded)
-            {
-                becomeLeader();
-            }
-            else 
-            {
-                unbecomeLeader();
-            }
-        }
-        else
-        {
-            yield return new WaitForSeconds(2);
-            GetComponent<Dinosaur>().setLeader(tempLeader);
-        }
-
     }
 
     internal void mergeHerd(List<GameObject> dinosDetected)

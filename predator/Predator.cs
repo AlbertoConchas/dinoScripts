@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.My_Assets.dinoScripts.search;
 
 public class Predator : Dinosaur {
 
@@ -20,9 +21,7 @@ public class Predator : Dinosaur {
 		//Inicializa el NavMeshAgent
 		nav = GetComponent<NavMeshAgent> ();
 		
-		nav.speed = (float)speed/3;
-		if(isNeededRun)
-			nav.speed = (float)speed*3;
+		nav.speed = Velocidad (isNeededRun);
 
 
         //Si no cuenta con eleccion de lider, el es el lider
@@ -41,7 +40,7 @@ public class Predator : Dinosaur {
 	// Update is called once per frame	
 	void Update () {
 
-		if (!metabolism()) 
+		if (!Metabolism()) 
 			return;
 
         actualNode = getActualPathNode();
@@ -52,6 +51,13 @@ public class Predator : Dinosaur {
 
 
         updateHerd<Predator>();
+		if (state == States.Hunting) {
+			isNeededRun = true;
+		} else {
+			isNeededRun = false;				
+	    }
+
+		nav.speed = Velocidad (isNeededRun);
         
         if ((leader == null || leader.GetComponent<Predator>().state == Predator.States.Die) && state != States.ChoosingLeader)
         {
@@ -387,7 +393,7 @@ public class Predator : Dinosaur {
 	
 	/**
 	 *	Funciones Biologicas de consumir energia
-	 */
+	 *
 	private bool metabolism(){
 		if ( state == States.Die ){
 			if ( this.flesh <= 0 )
@@ -407,7 +413,7 @@ public class Predator : Dinosaur {
 			return false;
 		}
 		return true;
-	}
+	}*/
 	
 	
 	//Mueve las estadisticas del enemigo y del agente
@@ -511,14 +517,11 @@ public class Predator : Dinosaur {
 		return getNeardest (g);
 	}
 
+    override protected bool isGoal(Node node)
+    {
+        return (node.getPreys() > 0);
+    }
 
-
-	/*
-	*	Llama al modulo de logica difusa para encontrar el area mas conveniente para encontrr comida
-	*/
-	private Vector3 searchForFood(){
-		return GetComponent<PredatorSearchFood> ().searchForFood (transform.position);
-	}
 	/*
 	private bool hungry(){
 		if (stamina < 120f || hp < 100)

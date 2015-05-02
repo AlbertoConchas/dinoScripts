@@ -5,10 +5,8 @@ using Assets.My_Assets.dinoScripts.search;
 
 public class Prey : Dinosaur
 {
-    private BinaryHeap<Node> open;//A* pathfinding
-    private HashSet<Node> closed;//A* pathfinding
-    private PathNode lastNode;
     public int runningTime = 200;
+	private FuzzyLogic fLogic;
     //Enum Para los estados del seguidor
 
 
@@ -16,6 +14,10 @@ public class Prey : Dinosaur
     // Use this for initialization
     void Start()
     {
+
+		if( fLogic == null )
+			setFuzzyLogic();
+
         base.start();//Init Dinosaur
 
         flesh = 500f;
@@ -29,7 +31,7 @@ public class Prey : Dinosaur
         //Inicializa el NavMeshAgent
         nav = GetComponent<NavMeshAgent>();
 
-        nav.speed = (float)((stamina / 100f) * speed) / 3;
+		nav.speed =Velocidad(false);
         /*if(isNeededRun)
             nav.speed = (float)((stamina/100f)*speed)*3;
         */
@@ -49,30 +51,37 @@ public class Prey : Dinosaur
     // Update is called once per frame	
     void Update()
     {
+        if (state == States.Die) return;
 
-        if (!metabolism())
+		if (!Metabolism())
             return;
-        if (runningTime > 0 && priority == Priorities.Run)
+
+        
+		if (runningTime > 0 && priority == Priorities.Run)
         {
             runningTime--;
             return;
         }
 
         actualNode = getActualPathNode();
-        priority = priorities();
+       // priority = priorities();
+		priority = fLogic.calPriority (actualNode, 100, 720, stamina, lifetime);
         memorize();
+
+		//Debug.Log (fLogic.calPriority(actualNode,100,maxLifeTime,stamina,lifetime));
 
         if (priority == Priorities.Run)
         {
-            nav.speed = (float)((stamina / 100f) * speed) * 3;
+			nav.speed =Velocidad(true);
         }
         else
-            nav.speed = (float)((stamina / 100f) * speed) / 3;
+			nav.speed = Velocidad(false);
 
-        updateHerd<Prey>();
+        //updateHerd<Prey>();
 
         if (state == States.Hiding || priority == Priorities.Run)
         {
+			if(IsMyLeader(gameObject))order_panic(gameObject);
 
             // PreyNeuronalChoose.NeuralReturn r = GetComponent<PreyNeuronalChoose>().migrate();
             nav.destination = actualNode.getNeighbors()[0].transform.position;
@@ -105,7 +114,7 @@ public class Prey : Dinosaur
         // si el lider ya no existe o esta muerto y ademas no se esta seleccionando lider
         else if ((leader == null || leader.GetComponent<Prey>().state == Prey.States.Die) && state != States.ChoosingLeader)
         {
-            
+			updateHerd<Prey>();
             if (GetComponent<LeaderChoosing>() == null)
                 setLeader(gameObject);
             else
@@ -116,6 +125,7 @@ public class Prey : Dinosaur
         }
         else if (state != States.ChoosingLeader)
         {
+
 
             /////////////////////////////////////////////////////////REPRODUCE
             
@@ -228,7 +238,10 @@ public class Prey : Dinosaur
         Vector3 foodPosition = searchForFood();
         state = States.Following;
         order_followMe(gameObject);
-        nav.destination = foodPosition;
+        if (!(foodPosition == actualNode.transform.position))
+        {
+            nav.destination = foodPosition;
+        }
     }
 
     void behavior_leader_following()
@@ -591,7 +604,7 @@ public class Prey : Dinosaur
     }
     /**
      *	Funciones Biologicas de consumir energia
-     */
+     *
     private bool metabolism()
     {
         float factor = 1f;
@@ -624,7 +637,7 @@ public class Prey : Dinosaur
             return false;
         }
         return true;
-    }
+    }*/
 
 
     //Mueve las estadisticas del enemigo y del agente
@@ -728,43 +741,10 @@ public class Prey : Dinosaur
         return g[Random.Range(0, g.Length - 1)];
     }
 
-
-    /*
-    *	Llama al modulo de logica difusa para encontrar el area mas conveniente para encontrr comida
-    */
-    private Vector3 searchForFood()
+    override protected bool isGoal(Node node)
     {
-        //init data structures if needed
-        if (open == null)
-        {
-            open = new BinaryHeap<Node>(new NodeComparator());
-            closed = new HashSet<Node>(new NodeEqualityComparer());
-        }
-
-
-        closed.Add(toNode(actualNode));
-        if (actualNode.getPlants() > 0)
-        {
-            open = null;
-            closed = null;
-            return toNode(actualNode).getPosition();
-        }
-        Node[] neighbors = expand();//Equivalent to expand step on A* algorithm
-        foreach (Node n in neighbors)
-        {
-            if (n.getPlants() > 0)
-            {
-                return n.getPosition();
-            }
-            if (!closed.Contains(n))
-            {
-                open.Insert(n);
-            }
-        }
-        return open.RemoveRoot().getPosition();
+        return (node.getPlants() > 0);
     }
-
-
 
     IEnumerator preyGrow()
     {
@@ -776,5 +756,27 @@ public class Prey : Dinosaur
             yield return new WaitForSeconds(1);
         }
     }
-
+	private void setFuzzyLogic(){
+		fLogic = GameObject.Find ("Global").GetComponent<FuzzyLogic> ();
+	}
+	/*
+	 * FormatData
+	 * Le da formato a la informacion de los nodos para procesarla
+	 */
+	private double[,] formatData(PathNode actualNode, GameObject[] neighbors){
+		double[,] nodesData = new double[ 3 , neighbors.Length + 1 ];
+		
+		//Agrega los vecinos para ser procesados
+		for (int i = 0; i < neighbors.Length; i++) {
+			nodesData[0,i] = neighbors[i].GetComponent<PathNode>().getPlants();
+			nodesData[1,i] =  actualNode.GetComponent<PathNode>().getPredators();
+			nodesData[2, i] = actualNode.GetComponent<PathNode>().getPrays();
+		}
+		//Agrega el nodo actual para ser procesado tambien
+		nodesData[0, neighbors.Length ] = actualNode.getPlants();
+		nodesData[1, neighbors.Length ] = actualNode.getPredators();
+		nodesData[2, neighbors.Length] = actualNode.getPrays();
+		
+		return nodesData;
+	}
 }

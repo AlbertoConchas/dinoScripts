@@ -1,8 +1,81 @@
 using UnityEngine;	
 using System;
+using Assets.My_Assets.dinoScripts;
 
 public class FuzzyLogic : MonoBehaviour{
+	double[] run = new double[] {1,1,1,.7,.4,.1,0,0,0,0,0};
+	double[] reproduce = new double[] {0,0,0,.4,.7,1,.7,.4,0,0,0};
+	double[] eat = new double[] {0,0,0,0,0,.1,.4,.7,1,1,1};
 
+	public Dinosaur.Priorities calPriority(PathNode actualNode,double maxStamina,double maxLifetime,double stamina,double lifetime){
+
+		/**
+		 *REEGLAS: 
+		 * 
+		 *  1.- si se tiene baja stamina entonces comer.
+		 *  2.- si se tiene alta stamina y una etapa adulta entonces se reproduce.
+		 *  3.- si hay muchos rivales o medios rivales y se es viejo o pocos companeros entonces corre
+		 *  3.1.- si hay muchos rivales y no se es viejo entonces corre.
+		 */
+
+		double regla1 = staminaBaja (stamina, maxStamina); //Math.Min (1,1-comer(1)+ staminaBaja(stamina,maxStamina));
+		double regla2 =  Math.Min(staminaAlta(stamina,maxStamina),adultez(lifetime,maxLifetime));
+		//double regla3 = Math.Min (1,/*1-correr(1)+*/Math.Max(rivalesAlto(actualNode.getPredators()),Math.Min(rivalesMedio(actualNode.getPredators()),Math.Max(vejez(lifetime,maxLifetime),companerosBajo(actualNode.getPrays())))));
+		double regla3 = Math.Min(rivalesMedio(actualNode.getPredators()),1-vejez(lifetime,maxLifetime));
+		//Debug.Log (rivalesMedio(actualNode.getPredators())+"  "+(1-vejez(lifetime,maxLifetime)));
+		//Fuzzifying
+
+		double[] runFuzzy = new double[run.Length];
+		Array.Copy (run,runFuzzy,run.Length);
+
+		double[] eatFuzzy = new double[run.Length];
+		Array.Copy (eat,eatFuzzy,eat.Length);
+
+		double[] reproduceFuzzy =new double[run.Length];
+		Array.Copy (reproduce,reproduceFuzzy,reproduce.Length);
+
+
+		for (int i = 0; i < runFuzzy.Length; i++) {
+			if(runFuzzy[i]>regla3){
+				runFuzzy[i]=regla3;
+			}
+		
+			if(eatFuzzy[i]>regla1){
+				eatFuzzy[i]=regla1;
+			}
+
+			if(reproduceFuzzy[i]>regla2){
+				reproduceFuzzy[i]=regla2;
+			}
+		}
+
+		//Max membership defuzzification method
+		int maxRun=0,maxEat=0,maxReproduce=0;
+
+		for (int i = 0; i < runFuzzy.Length; i++) {
+			if(runFuzzy[i]>runFuzzy[maxRun]){
+				maxRun=i;
+			}
+			if(eatFuzzy[i]>eatFuzzy[maxEat]){
+				maxEat=i;
+			}
+			if(reproduceFuzzy[i]>reproduceFuzzy[maxReproduce]){
+				maxReproduce=i;
+			}
+		}
+		Debug.Log (regla1);
+		Debug.Log (runFuzzy[maxRun]+" "+eatFuzzy[maxEat]+" "+reproduceFuzzy[maxReproduce]);
+		if (runFuzzy[maxRun] > 0) {
+			return Dinosaur.Priorities.Run;		
+		}else if (eatFuzzy[maxEat] > runFuzzy[maxRun] && eatFuzzy[maxEat] > reproduceFuzzy[maxReproduce] && eatFuzzy[maxEat] !=0){
+			return Dinosaur.Priorities.Eat;
+		}else if(reproduceFuzzy[maxReproduce] > runFuzzy[maxRun] && reproduceFuzzy[maxReproduce] > eatFuzzy[maxEat] && reproduceFuzzy[maxReproduce] !=0){
+			return Dinosaur.Priorities.Reproduce;
+		}else{
+			return Dinosaur.Priorities.Obey;
+		}
+
+	}
 
 	/*
 	 * Calcula probabilidades difusas
@@ -17,7 +90,7 @@ public class FuzzyLogic : MonoBehaviour{
 			double[] error = new double[]{};
 			return error;
 		}
-
+	
 		//Prepara variables
 		double[] ps = new double[G.GetLength(1)];
 		double comidaTotal, rivalesTotal, companerosTotal;
@@ -69,17 +142,17 @@ public class FuzzyLogic : MonoBehaviour{
 			//		b) Mucha comida & Pocos rivales & pocos compañeros
 			
 			// 1)
-			double tmpRegla1 = Math.Max ( comidaBajo(comida), rivalesAlto(rivales) );
-			tmpRegla1 = Math.Max ( tmpRegla1, companerosAlto(companeros) );
+			double tmpRegla1 = Math.Max ( comidaBajo(comida), rivalesAlto( (int)( Math.Round(rivales,1) * 10 )) );
+			tmpRegla1 = Math.Max ( tmpRegla1, companerosAlto((int)( Math.Round(companeros,1) * 10 )) );
 			
 			// 2)
-			double tmpRegla2 = Math.Max ( comidaMedio(comida), rivalesMedio(rivales) );
-			tmpRegla2 = Math.Min ( tmpRegla2, companerosMedio(companeros) );
+			double tmpRegla2 = Math.Max ( comidaMedio(comida), rivalesMedio((int)( Math.Round(rivales,1) * 10 )) );
+			tmpRegla2 = Math.Min ( tmpRegla2, companerosMedio((int)( Math.Round(companeros,1) * 10 )) );
 			
 			// 3)
-			double tmpRegla3 = Math.Min ( rivalesAlto(rivales), companerosMedio(companeros) );
-			tmpRegla3 = Math.Max ( tmpRegla3, companerosBajo(companeros) );
-			tmpRegla3 = Math.Max ( tmpRegla3, rivalesBajo(rivales) );
+			double tmpRegla3 = Math.Min ( rivalesAlto((int)( Math.Round(rivales,1) * 10 )), companerosMedio((int)( Math.Round(companeros,1) * 10 )) );
+			tmpRegla3 = Math.Max ( tmpRegla3, companerosBajo((int)( Math.Round(companeros,1) * 10 )) );
+			tmpRegla3 = Math.Max ( tmpRegla3, rivalesBajo((int)( Math.Round(rivales,1) * 10 )) );
 			tmpRegla3 = Math.Min ( tmpRegla3, comidaAlto(comida) );
 
 			
@@ -178,42 +251,128 @@ public class FuzzyLogic : MonoBehaviour{
 	}
 	
 	//RIVALES
-	protected double rivalesBajo( double x ){
-		int y = (int)( Math.Round(x,1) * 10 ); 
+	protected double rivalesBajo( int x ){
+		if (x >= 8)x = 7;
 		//double[] fit = new double[] {.6,.6,.48,.35,.22,.1,0,0,0,0,0};
-		double[] fit = new double[] {0,.3,.6,.8,1,1,1,1,1,1,1};
-		return fit[y];
+		double[] fit = new double[] {1,.6,.3,0,0,0,0,0};
+		return fit[x];
 	}
-	protected double rivalesMedio( double x ){
-		int y = (int)( Math.Round(x,1) * 10 ); 
+	protected double rivalesMedio( int x ){
+		if (x >= 8)x = 7; 
 		//double[] fit = new double[] {1,.9,.8,.7,.6,.5,.4,.3,.2,.1,0};
-		double[] fit = new double[] {0,0,0,.4,.7,1,.7,.4,0,0,0};
-		return fit[y];
+		double[] fit = new double[] {0,.4,.7,.1,1,.7,.4,0};
+		return fit[x];
 	}
-	protected double rivalesAlto( double x ){
-		int y = (int)( Math.Round(x,1) * 10 ); 
+	protected double rivalesAlto( int x ){
+		if (x >= 8)x = 7;
 		//double[] fit = new double[] {1,1,1,1,.9,.8,.72,.63,.52,.45,.36};
-		double[] fit = new double[] {0,0,0,0,0,0,.2,.4,.6,.8,1};
-		return fit[y];
+		double[] fit = new double[] {0,0,0,0,0,.3,.6,1};
+		return fit[x];
 	}
 	
 	//COMPAÑEROS
-	protected double companerosBajo( double x ){
-		int y = (int)( Math.Round(x,1) * 10 ); 
+	protected double companerosBajo( int x ){
+		if (x >= 8)x = 7;
 		//double[] fit = new double[] {.6,.88,1,.88,.7,.5,.3,0,0,0,0};
-		double[] fit = new double[] {0,.3,.6,.8,1,1,1,1,1,1,1};
-		return fit[y];
+		double[] fit = new double[] {1,.6,.3,0,0,0,0,0};
+		return fit[x];
 	}
-	protected double companerosMedio( double x ){
-		int y = (int)( Math.Round(x,1) * 10 ); 
+	protected double companerosMedio( int x ){
+		if (x >= 8)x = 7;
 		//double[] fit = new double[] {0,.2,.4,.6,.8,1,.8,.6,.4,.2,0};
-		double[] fit = new double[] {0,0,0,.4,.7,1,.7,.4,0,0,0};
-		return fit[y];
+		double[] fit = new double[] {0,.4,.7,.1,1,.7,.4,0};
+		return fit[x];
 	}
-	protected double companerosAlto( double x ){
-		int y = (int)( Math.Round(x,1) * 10 ); 
+	protected double companerosAlto( int x ){
+		if (x >= 8)x = 7;
 		//double[] fit = new double[] {0,0,0,0,.2,.4,.6,.8,1,.7,.5};
 		double[] fit = new double[] {0,0,0,0,0,0,.2,.4,.6,.8,1};
-		return fit[y];
+		return fit[x];
+	}
+
+	//STAMINA
+	protected double staminaBaja( double x , double maxSta){//  ¯¯¯¯¯¯\____
+		double stam=(x*100)/maxSta;//porcentaje de stamina
+		if(stam>=0 && stam<30){
+			return 1;
+		}else if(stam>=30 && stam<70){
+			return (70-stam)/40;
+		}else{
+			return 0;
+		}
+	}
+	protected double staminaAlta( double x, double maxSta){ // _____/¯¯¯¯¯
+		double stam=(x*100)/maxSta;//porcentaje de stamina
+		if(stam>=0 && stam<30){
+			return 0;
+		}else if(stam>=30 && stam<70){
+			return (stam-30)/40;
+		}else{
+			return 1;
+		}
+
+	}
+   //ETAPAS DE VIDA  
+	protected double juventud( double x ,double maxLifetime ){  //  ¯¯¯¯¯¯\____
+		double life=(x*100)/maxLifetime;//porcentaje de stamina
+		if(life>=0 && life<20){
+			return 1;
+		}else if(life>=20 && life<40){
+			return (40-life)/30;
+		}else{
+			return 0;
+		}
+	}  
+	protected double adultez( double x,double maxLifetime ){ //      ___/¯¯¯¯\___
+		double life=(x*100)/maxLifetime;//porcentaje de stamina
+		if(life>=0 && life<20){
+			return 0;
+		}else if(life>=20 && life<40){
+			return (life-20)/20;
+		}else if (life >=40 && life <60){
+			return 1;
+		}else if (life >=60 && life <80){
+			return (80-life)/20;
+		}else{
+			return 0;
+		}
+	}
+
+	/*
+	 * 
+	 *  lifetime += Time.deltaTime;
+
+            if (lifetime < 240)
+            {
+                LifeState = LifeEnum.Joven;
+            }
+            else if (lifetime < 480)
+            {
+                LifeState = LifeEnum.Adulto;
+            }
+            else
+            {
+                LifeState = LifeEnum.Vejez;
+            }*/
+
+	protected double vejez( double x,double maxLifetime ){ // _____/¯¯¯¯¯
+		double life=(x*100)/maxLifetime;//porcentaje de stamina
+		if(life>=0 && life<60){
+			return 0;
+		}else if(life>=60 && life<80){
+			return (life-60)/20;
+		}else{
+			return 1;
+		}
+	}
+	//PRIORIDADES
+	protected double correr( int x ){  //  ¯¯¯¯¯¯\____ 
+		return run[x];
+	}
+	protected double reproducirse( int x ){ // _/¯\_
+		return reproduce[x];
+	}
+	protected double comer( int x ){// _____/¯¯¯¯¯
+		return eat[x];
 	}
 }
