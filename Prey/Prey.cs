@@ -51,6 +51,7 @@ public class Prey : Dinosaur
     // Update is called once per frame	
     void Update()
     {
+        if (state == States.Die) return;
 
 		if (!Metabolism())
             return;

@@ -192,7 +192,7 @@ public abstract class Dinosaur : DinoObject{
 	protected void die(){
 		state = States.Die;
 		this.GetComponent<DinasorsAnimationCorrector>().die();
-		//gameObject.GetComponent<PredatorLeaderChoosing> ().enabled = false;
+		gameObject.GetComponent<LeaderChoosing> ().enabled = false;
 		if (IsMyLeader (gameObject)) 
         {
 			//LeaderSaysUnsetLeader (gameObject);
