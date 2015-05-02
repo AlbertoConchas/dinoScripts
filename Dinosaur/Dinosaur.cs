@@ -149,6 +149,26 @@ public abstract class Dinosaur : DinoObject{
             }
         }
 
+        List<GameObject> dead = new List<GameObject>();
+
+        /*checar si hay alguien muerto y sacarlo de la manada*/
+        foreach(GameObject dino in herd)
+        {
+            if (inRangeHerd.Contains(dino) && dino.GetComponent<Dinosaur>().state == States.Die) 
+            {
+                dead.Add(dino);
+            }
+        }
+        if (dead.Count > 0) 
+        {
+            foreach (GameObject dino in dead)
+            {
+                herd.Remove(dino);
+            }
+            return true;
+        }
+
+
         if (herd.Count == 0) // no habia manada
         {
             herd = inRangeHerd;
@@ -161,7 +181,7 @@ public abstract class Dinosaur : DinoObject{
         {
             return false;
         }
-        else // mas mas dinos en la manada!
+        else // hay mas dinos en la manada!
         {
             GetComponent<LeaderChoosing>().mergeHerd(inRangeHerd);
             //herd = inRangeHerd;
@@ -188,11 +208,13 @@ public abstract class Dinosaur : DinoObject{
  protected  void stop()
   {
       nav.destination = transform.position;
-  }	
-	protected void die(){
+  }
+
+    protected override void Die()
+    {
 		state = States.Die;
 		this.GetComponent<DinasorsAnimationCorrector>().die();
-		gameObject.GetComponent<LeaderChoosing> ().enabled = false;
+        defense = 0;
 		if (IsMyLeader (gameObject)) 
         {
 			//LeaderSaysUnsetLeader (gameObject);
@@ -202,6 +224,9 @@ public abstract class Dinosaur : DinoObject{
                 Destroy(t.gameObject);
             }
 		}
+        isLeader = false;
+        leader = null;
+        herd = null;
 	}
 
     protected bool hungry()

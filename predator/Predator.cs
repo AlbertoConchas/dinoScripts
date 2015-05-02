@@ -39,6 +39,7 @@ public class Predator : Dinosaur {
 	
 	// Update is called once per frame	
 	void Update () {
+        if (state == States.Die) return;
 
 		if (!Metabolism()) 
 			return;
@@ -58,6 +59,8 @@ public class Predator : Dinosaur {
 	    }
 
 		nav.speed = Velocidad (isNeededRun);
+
+        updateHerd<Predator>();
         
         if ((leader == null || leader.GetComponent<Predator>().state == Predator.States.Die) && state != States.ChoosingLeader)
         {

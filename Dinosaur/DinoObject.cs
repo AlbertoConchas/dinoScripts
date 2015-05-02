@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using Random = UnityEngine.Random;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Assets.My_Assets
 {
-	public class DinoObject : MonoBehaviour
+    public abstract class DinoObject : MonoBehaviour
 	{
 		#region Propiedades
 		
@@ -198,16 +199,8 @@ namespace Assets.My_Assets
 		/// <summary>
 		/// Muere el agente
 		/// </summary>
-		protected void Die()
-		{
-			state = States.Die;
-			GetComponent<DinasorsAnimationCorrector>().die();
-			defense = 0;
-			if (gameObject.transform.Find("leaderLigth") != null)
-			{
-				Destroy(gameObject.transform.Find("leaderLigth").gameObject);
-			}
-		}
+        protected abstract void Die();
+
 		#endregion
 		
 		#region Funciones de movimiento

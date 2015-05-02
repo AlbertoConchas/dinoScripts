@@ -103,7 +103,6 @@ public class LeaderChoosing : MonoBehaviour {
         yield return new WaitForSeconds(3);
         if (requestResponded == false)
         {
-            tempLeader = gameObject;
             BroadcastLeadership(gameObject);
 
             //Espera 2 segundos por si alguien tambien quiere ser lider y tiene mejores capacidades que yo
@@ -116,14 +115,17 @@ public class LeaderChoosing : MonoBehaviour {
             GetComponent<Dinosaur>().setLeader(tempLeader);
         }
 
-        // quita o pone la luz del lider
-        if (tempLeader.GetInstanceID() == gameObject.GetInstanceID())
-        {
-            becomeLeader();
-        }
-        else
-        {
-            unbecomeLeader();
+        if (tempLeader != null) 
+        { 
+            // quita o pone la luz del lider
+            if (tempLeader.GetInstanceID() == gameObject.GetInstanceID())
+            {
+                becomeLeader();
+            }
+            else
+            {
+                unbecomeLeader();
+            }
         }
     }
 
@@ -147,7 +149,7 @@ public class LeaderChoosing : MonoBehaviour {
             brigth.light.type = LightType.Spot;								//Se elije el tipo de luz SPOT
 
             //Se pone la mira hacia abajo
-            brigth.transform.position = brigth.transform.parent.position + new Vector3(0, 3, 0);
+            brigth.transform.position = brigth.transform.parent.position + new Vector3(0, 4, 0);
             brigth.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
 
             //Color, Alcance, Dispercion
@@ -160,6 +162,7 @@ public class LeaderChoosing : MonoBehaviour {
         {
             brigth = t.gameObject;
         }
+        gameObject.GetComponent<Dinosaur>().isLeader = true;
     }
 
     /*
@@ -174,6 +177,7 @@ public class LeaderChoosing : MonoBehaviour {
         {
             Destroy(t.gameObject);
         }
+        gameObject.GetComponent<Dinosaur>().isLeader = false;
     }
 
     internal void mergeHerd(List<GameObject> dinosDetected)
