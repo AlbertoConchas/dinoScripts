@@ -124,7 +124,7 @@ public class PathNode : MonoBehaviour {
 		Collider[] hitColliders = Physics.OverlapSphere(transform.position, this.ratius);
 
 		//Valor MINIMO, Agregado para evitar errores de matriz vacia en el algoritmo de FUZZY LOGIC
-		int prays = 1;
+		int prays = 0;
 		for (int i = 0; i < hitColliders.Length; i++) {
 			
 			//Si es un velocirraptor
