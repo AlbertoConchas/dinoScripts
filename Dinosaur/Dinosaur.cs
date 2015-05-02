@@ -133,6 +133,13 @@ public abstract class Dinosaur : DinoObject{
             return true;
         }
 
+        //quitar dinos muertos del inRangeHerd!
+        GameObject[] array = (GameObject[])inRangeHerd.ToArray();
+        foreach (GameObject deadDino in array) 
+        {
+            if (deadDino.GetComponent<Dinosaur>().state == Dinosaur.States.Die) inRangeHerd.Remove(deadDino);
+        }
+
 
         if (herd.Count == 0) // no habia manada
         {
