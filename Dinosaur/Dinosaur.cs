@@ -8,7 +8,7 @@ using Assets.My_Assets.dinoScripts.search;
 using Assets.My_Assets.dinoScripts.Dinosaur;
 using Assets.My_Assets;
 
-public class Dinosaur : DinoObject{
+public abstract class Dinosaur : DinoObject{
    /* //public Transform m_Prey;
     public float hp = 100f;			//Salud de la entidad*/
    // public int np = 10;			//Nutricion aportada a quien se alimente de la entidad
@@ -44,8 +44,8 @@ public class Dinosaur : DinoObject{
     private GameObject tempLeader;
 
     //Search
-    private BinaryHeap<Node> open;//A* pathfinding
-    private HashSet<Node> closed;//A* pathfinding
+    //private BinaryHeap<Node> open;//A* pathfinding
+    //private HashSet<Node> closed;//A* pathfinding
 
     public enum Priorities {Eat, Obey, Reproduce, Run};
 
