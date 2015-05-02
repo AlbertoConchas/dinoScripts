@@ -31,7 +31,7 @@ public class Prey : Dinosaur
         //Inicializa el NavMeshAgent
         nav = GetComponent<NavMeshAgent>();
 
-        nav.speed = (float)((stamina / 100f) * speed) / 3;
+		nav.speed =Velocidad(false);
         /*if(isNeededRun)
             nav.speed = (float)((stamina/100f)*speed)*3;
         */
@@ -65,22 +65,23 @@ public class Prey : Dinosaur
 
         actualNode = getActualPathNode();
        // priority = priorities();
-		priority = fLogic.calPriority (actualNode, 100, maxLifeTime, stamina, lifetime);
+		priority = fLogic.calPriority (actualNode, 100, 720, stamina, lifetime);
         memorize();
 
 		//Debug.Log (fLogic.calPriority(actualNode,100,maxLifeTime,stamina,lifetime));
 
         if (priority == Priorities.Run)
         {
-            nav.speed = (float)((stamina / 100f) * speed) * 3;
+			nav.speed =Velocidad(true);
         }
         else
-            nav.speed = (float)((stamina / 100f) * speed) / 3;
+			nav.speed = Velocidad(false);
 
-        updateHerd<Prey>();
+        //updateHerd<Prey>();
 
         if (state == States.Hiding || priority == Priorities.Run)
         {
+			if(IsMyLeader(gameObject))order_panic(gameObject);
 
             // PreyNeuronalChoose.NeuralReturn r = GetComponent<PreyNeuronalChoose>().migrate();
             nav.destination = actualNode.getNeighbors()[0].transform.position;
@@ -113,7 +114,7 @@ public class Prey : Dinosaur
         // si el lider ya no existe o esta muerto y ademas no se esta seleccionando lider
         else if ((leader == null || leader.GetComponent<Prey>().state == Prey.States.Die) && state != States.ChoosingLeader)
         {
-            
+			updateHerd<Prey>();
             if (GetComponent<LeaderChoosing>() == null)
                 setLeader(gameObject);
             else

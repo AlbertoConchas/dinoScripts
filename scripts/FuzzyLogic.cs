@@ -15,13 +15,14 @@ public class FuzzyLogic : MonoBehaviour{
 		 *  1.- si se tiene baja stamina entonces comer.
 		 *  2.- si se tiene alta stamina y una etapa adulta entonces se reproduce.
 		 *  3.- si hay muchos rivales o medios rivales y se es viejo o pocos companeros entonces corre
-		 *  4.-
+		 *  3.1.- si hay muchos rivales y no se es viejo entonces corre.
 		 */
 
 		double regla1 = staminaBaja (stamina, maxStamina); //Math.Min (1,1-comer(1)+ staminaBaja(stamina,maxStamina));
-		double regla2 = Math.Min (1,/*1-reproducirse(1) +*/ Math.Min(staminaAlta(stamina,maxStamina),adultez(lifetime,maxLifetime)));
-		double regla3 = Math.Min (1,/*1-correr(1)+*/Math.Max(rivalesAlto(actualNode.getPredators()),Math.Min(rivalesMedio(actualNode.getPredators()),Math.Max(vejez(lifetime,maxLifetime),companerosBajo(actualNode.getPrays())))));
-
+		double regla2 =  Math.Min(staminaAlta(stamina,maxStamina),adultez(lifetime,maxLifetime));
+		//double regla3 = Math.Min (1,/*1-correr(1)+*/Math.Max(rivalesAlto(actualNode.getPredators()),Math.Min(rivalesMedio(actualNode.getPredators()),Math.Max(vejez(lifetime,maxLifetime),companerosBajo(actualNode.getPrays())))));
+		double regla3 = Math.Min(rivalesMedio(actualNode.getPredators()),1-vejez(lifetime,maxLifetime));
+		//Debug.Log (rivalesMedio(actualNode.getPredators())+"  "+(1-vejez(lifetime,maxLifetime)));
 		//Fuzzifying
 
 		double[] runFuzzy = new double[run.Length];
@@ -33,7 +34,7 @@ public class FuzzyLogic : MonoBehaviour{
 		double[] reproduceFuzzy =new double[run.Length];
 		Array.Copy (reproduce,reproduceFuzzy,reproduce.Length);
 
-		//Debug.Log (regla3+"  "+runFuzzy[1]);
+
 		for (int i = 0; i < runFuzzy.Length; i++) {
 			if(runFuzzy[i]>regla3){
 				runFuzzy[i]=regla3;
@@ -47,7 +48,7 @@ public class FuzzyLogic : MonoBehaviour{
 				reproduceFuzzy[i]=regla2;
 			}
 		}
-		//Debug.Log (regla3+"  "+runFuzzy[1]+" "+run[1]);
+
 		//Max membership defuzzification method
 		int maxRun=0,maxEat=0,maxReproduce=0;
 
@@ -62,7 +63,8 @@ public class FuzzyLogic : MonoBehaviour{
 				maxReproduce=i;
 			}
 		}
-		//Debug.Log (runFuzzy[maxRun]+" "+eatFuzzy[maxEat]+" "+reproduceFuzzy[maxReproduce]);
+		Debug.Log (regla1);
+		Debug.Log (runFuzzy[maxRun]+" "+eatFuzzy[maxEat]+" "+reproduceFuzzy[maxReproduce]);
 		if (runFuzzy[maxRun] > 0) {
 			return Dinosaur.Priorities.Run;		
 		}else if (eatFuzzy[maxEat] > runFuzzy[maxRun] && eatFuzzy[maxEat] > reproduceFuzzy[maxReproduce] && eatFuzzy[maxEat] !=0){
