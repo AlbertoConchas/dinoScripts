@@ -512,7 +512,7 @@ public class Predator : Dinosaur {
 		return getNeardest (g);
 	}
 
-    protected bool isGoal(Node node)
+    override protected bool isGoal(Node node)
     {
         return (node.getPreys() > 0);
     }

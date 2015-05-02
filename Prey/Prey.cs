@@ -739,7 +739,7 @@ public class Prey : Dinosaur
         return g[Random.Range(0, g.Length - 1)];
     }
 
-    protected bool isGoal(Node node)
+    override protected bool isGoal(Node node)
     {
         return (node.getPlants() > 0);
     }
