@@ -150,6 +150,7 @@ public class Predator : Dinosaur {
 	void behavior_leader_searching(){
 		//Calcula nueva posicion de la comida
 		Vector3 foodPosition = 	searchForFood();
+		Debug.Log (foodPosition +"   "+ actualNode.transform.position);
 		if (foodPosition != Vector3.zero) {
 			state = States.Following;
 			nav.destination = foodPosition;
@@ -519,6 +520,7 @@ public class Predator : Dinosaur {
 
     override protected bool isGoal(Node node)
     {
+		Debug.Log (node.getPreys());
         return (node.getPreys() > 0);
     }
 

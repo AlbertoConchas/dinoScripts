@@ -4,7 +4,7 @@ using Assets.My_Assets.dinoScripts;
 
 public class FuzzyLogic : MonoBehaviour{
 	double[] run = new double[] {1,1,1,.7,.4,.1,0,0,0,0,0};
-	double[] reproduce = new double[] {0,0,0,.4,.7,1,.7,.4,0,0,0};
+	double[] reproduce = new double[] {0,0,0,.4,.5,.5,.5,.4,0,0,0};//{0,0,0,.4,.7,1,.7,.4,0,0,0};
 	double[] eat = new double[] {0,0,0,0,0,.1,.4,.7,1,1,1};
 
 	public Dinosaur.Priorities calPriority(PathNode actualNode,double maxStamina,double maxLifetime,double stamina,double lifetime){
@@ -63,8 +63,7 @@ public class FuzzyLogic : MonoBehaviour{
 				maxReproduce=i;
 			}
 		}
-		Debug.Log (regla1);
-		Debug.Log (runFuzzy[maxRun]+" "+eatFuzzy[maxEat]+" "+reproduceFuzzy[maxReproduce]);
+		//Debug.Log (runFuzzy[maxRun]+" "+eatFuzzy[maxEat]+" "+reproduceFuzzy[maxReproduce]);
 		if (runFuzzy[maxRun] > 0) {
 			return Dinosaur.Priorities.Run;		
 		}else if (eatFuzzy[maxEat] > runFuzzy[maxRun] && eatFuzzy[maxEat] > reproduceFuzzy[maxReproduce] && eatFuzzy[maxEat] !=0){

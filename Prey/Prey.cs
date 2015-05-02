@@ -90,7 +90,7 @@ public class Prey : Dinosaur
                 if (lastNode == null)
                 {
                     lastNode = actualNode;
-                    nav.destination = actualNode.getNeighbors()[i].transform.position;
+                    nav.destination = actualNode.getNeighbors()[i].transform.position;// hacia donde correr!
                     break;
                 }
                 else if (lastNode.transform.position != actualNode.getNeighbors()[i].transform.position)
