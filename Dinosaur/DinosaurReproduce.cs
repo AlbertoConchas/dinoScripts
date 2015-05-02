@@ -56,11 +56,13 @@ public class DinosaurReproduce : MonoBehaviour
 
         if (partner != null)
         {
-            gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Searching;
+            gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Waiting;
             startReproduction();
+            unbecomeReproduce();
         }
         else {
-            gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Searching;
+            gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Waiting;
+            unbecomeReproduce();
         }
 
             return;
@@ -72,6 +74,7 @@ public class DinosaurReproduce : MonoBehaviour
      **/
     private void startReproduction()
     {
+     
         if (GetComponent<Dinosaur>().female)
         {
             crossover(GetComponent<Dinosaur>().crossover);
@@ -244,8 +247,66 @@ public class DinosaurReproduce : MonoBehaviour
     }
     private IEnumerator startElection()
     {
+        becomeReproduce();
         selectPartner();
         yield return new WaitForSeconds(2);
     }
+
+
+
+
+
+    /**
+    * Consegui ser lider, crea la luz encima de el
+    **/
+    public void becomeReproduce()
+    {
+
+        //Crea el objeto al que se le agregara la luz
+        Transform t = gameObject.transform.Find("shine");
+        GameObject brigth = null;
+        if (t == null)
+        {
+            brigth = new GameObject("shine");
+            brigth.AddComponent(typeof(Light));							//se le agrega la luz
+
+            brigth.transform.parent = transform;							//Se fija a la entidad
+
+
+            brigth.light.type = LightType.Spot;								//Se elije el tipo de luz SPOT
+
+            //Se pone la mira hacia abajo
+            brigth.transform.position = brigth.transform.parent.position + new Vector3(0, 3, 0);
+            brigth.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
+
+            //Color, Alcance, Dispercion
+            brigth.light.color = Color.magenta;
+            brigth.light.range = 15.0f;
+            brigth.light.spotAngle = 20.0f;
+            brigth.light.intensity = 1.20f;
+        }
+        else
+        {
+            brigth = t.gameObject;
+        }
+    }
+
+
+    /*
+    * Otro dino me quito el liderazgo
+    */
+    public void unbecomeReproduce()
+    {
+        //encuentra el objeto al que se le agregara la luz
+        Transform t = gameObject.transform.Find("shine");
+        if (t == null) return;
+        else
+        {
+            Destroy(t.gameObject);
+        }
+    }
+
+
+
 
 }
