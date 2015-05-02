@@ -6,14 +6,17 @@ public class LeaderChoosing : MonoBehaviour {
 
 	public float leadership;
 	private bool requestResponded;
+    private bool hasToBroadcast;
 	private GameObject tempLeader;
 
 
     // Llamada a la votacion
     public void choose()
     {
+        GetComponent<Dinosaur>().state = Dinosaur.States.ChoosingLeader;
         tempLeader = null;
         requestResponded = false;
+        hasToBroadcast = false;
         leadership = gameObject.GetComponent<Dinosaur>().getLeadershipStat();
 
         StartCoroutine(startElection());
@@ -54,6 +57,7 @@ public class LeaderChoosing : MonoBehaviour {
     private void leadershipRequest(GameObject sender)
     {
         sender.SendMessage("leadershioRequestResponse");
+        hasToBroadcast = true;
     }
 
 
@@ -76,14 +80,6 @@ public class LeaderChoosing : MonoBehaviour {
      **/
     private void BroadcastLeadership(GameObject leader)
     {
-        if(leader.GetComponent<Dinosaur>().state == Dinosaur.States.Die)
-        {
-            return;
-        }
-        if (tempLeader != null && tempLeader.GetInstanceID() == leader.GetInstanceID())
-        {
-            return;
-        }
         if (tempLeader == null || tempLeader.GetComponent<Dinosaur>().leadership < leader.GetComponent<Dinosaur>().leadership)
         {
             tempLeader = leader;
@@ -100,18 +96,19 @@ public class LeaderChoosing : MonoBehaviour {
      **/
     private IEnumerator endElection()
     {
-        yield return new WaitForSeconds(3);
+        if (hasToBroadcast) BroadcastLeadership(gameObject);
+        yield return new WaitForSeconds(2);
         if (requestResponded == false)
         {
             BroadcastLeadership(gameObject);
 
             //Espera 2 segundos por si alguien tambien quiere ser lider y tiene mejores capacidades que yo
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(3);
             GetComponent<Dinosaur>().setLeader(tempLeader);
         }
         else
         {
-            yield return new WaitForSeconds(2);
+            yield return new WaitForSeconds(3);
             GetComponent<Dinosaur>().setLeader(tempLeader);
         }
 
@@ -127,6 +124,7 @@ public class LeaderChoosing : MonoBehaviour {
                 unbecomeLeader();
             }
         }
+        GetComponent<Dinosaur>().state = Dinosaur.States.Waiting;
     }
 
     /**
@@ -149,7 +147,7 @@ public class LeaderChoosing : MonoBehaviour {
             brigth.light.type = LightType.Spot;								//Se elije el tipo de luz SPOT
 
             //Se pone la mira hacia abajo
-            brigth.transform.position = brigth.transform.parent.position + new Vector3(0, 4, 0);
+            brigth.transform.position = brigth.transform.parent.position + new Vector3(0, 3.5f, 0);
             brigth.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
 
             //Color, Alcance, Dispercion
