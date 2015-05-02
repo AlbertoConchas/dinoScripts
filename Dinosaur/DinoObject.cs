@@ -335,7 +335,7 @@ namespace Assets.My_Assets
         /// <returns>Retorna si el objeto es mi lider</returns>
         protected bool IsMyLeader(GameObject l)
         {
-            if (l.GetInstanceID() == leader.GetInstanceID())
+            if (l!=null && leader!=null && l.GetInstanceID() == leader.GetInstanceID())
                 return true;
             return false;
         }
@@ -347,7 +347,7 @@ namespace Assets.My_Assets
         /// <returns>Retorna si el gameobject enviado es igual a la entidad actual</returns>
         protected bool IsMe(GameObject g)
         {
-            if (g.GetInstanceID() == gameObject.GetInstanceID())
+            if (g!=null && g.GetInstanceID() == gameObject.GetInstanceID())
                 return true;
             return false;
         }
