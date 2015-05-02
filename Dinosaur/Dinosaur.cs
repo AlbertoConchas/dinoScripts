@@ -9,17 +9,6 @@ using Assets.My_Assets.dinoScripts.Dinosaur;
 using Assets.My_Assets;
 
 public abstract class Dinosaur : DinoObject{
-   /* //public Transform m_Prey;
-    public float hp = 100f;			//Salud de la entidad*/
-   // public int np = 10;			//Nutricion aportada a quien se alimente de la entidad
-  /*  public int speed = 2;			//Velocidad de la entidad
-    public int comRange = 10;			//Rango de comunicacion
-    public double stamina = 100f;			//Resistencia (nesesaria para correr etc....)
-    public float lifetime = 10000f;		//Tiempo de vida
-    public float attack = 10f;			//Daño que realiza la entidad
-    public float flesh = 200f;
-	public bool female;
-    public States state;*/
     public float leadership;
 	public Priorities priority;
 	
@@ -104,30 +93,6 @@ public abstract class Dinosaur : DinoObject{
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-    /*
- * Funcion para enviar a todos los objetos cercanos
- * string Messaage: Funcion que sera ejecutada en los objetos encontrados
- * object obj: Parametros para enviar a esa funcion
- *
-   public void BroadCast(string message, object obj)
-    {
-        herd.Remove(null);
-       	if(herd.Count>0)
-        foreach (GameObject dino in herd)
-        {
-            if (dino != null || dino.GetComponent<Dinosaur>().state != States.Die)
-            {
-				dino.SendMessage(message, (GameObject)obj);
-            }
-            else
-            {
-                //herd.Remove(dino);
-            }
-            
-        }
-    }*/
    public List<GameObject> getHerd() {
        return herd;
    }
