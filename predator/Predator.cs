@@ -81,11 +81,11 @@ public class Predator : Dinosaur {
 
             /////////////////////////////////////////////////////////REPRODUCE
 			/// 
-			if(priority==Priorities.Reproduce && state==States.Waiting && repLapse <=0){
+			if(priority==Priorities.Reproduce && state==States.Waiting && repLapse <=0){//cambia a reproduccion
 				
 				state=States.Reproduce;
 				
-			}else if((state==States.Waiting || state==States.Reproduce)&&priority==Priorities.Eat){
+			}else if((state==States.Waiting || state==States.Reproduce) && priority==Priorities.Eat){//pero si quiere comer
 				
 				state=States.Eating;
 			}
@@ -469,8 +469,12 @@ public class Predator : Dinosaur {
         if (hungry())
         {
             return Priorities.Eat;
-        }
-        return Priorities.Obey;
+        }else if(LifeState== LifeEnum.Adulto && state == States.Waiting){
+			return Priorities.Reproduce;
+		}
+        
+
+		return Priorities.Obey;
     }
 
 	

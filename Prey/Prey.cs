@@ -139,8 +139,11 @@ public class Prey : Dinosaur
 				//repLapse = 60;
 
 			}else if((state==States.Waiting || state==States.Reproduce)&&priority==Priorities.Eat ){
-
-				state=States.Eating;
+				if(actualFood==null){//si no tiene comida caza
+					state=States.Hunting;
+				}else{
+					state=States.Eating;
+				}
 			}
 
             if (state == States.Reproduce && female)

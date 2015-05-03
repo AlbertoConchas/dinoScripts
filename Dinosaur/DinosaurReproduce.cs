@@ -240,9 +240,9 @@ public class DinosaurReproduce : MonoBehaviour
 						}
 
 
-		 }/* else {
+		 } else {
 			child.GetComponent<Dinosaur>().setLeader(GetComponent<Dinosaur>().getLeader());
-		 }			aqui asignaba el lider al hijo*/
+		 }			
 
 
         //Classify the herd 
