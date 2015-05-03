@@ -14,7 +14,7 @@ public class Prey : Dinosaur
     // Use this for initialization
     void Start()
     {
-
+        becomePrey();
 		if( fLogic == null )
 			setFuzzyLogic();
 
@@ -695,4 +695,34 @@ public class Prey : Dinosaur
 		
 		return nodesData;
 	}
+   
+    public void becomePrey()
+    {
+
+        //Crea el objeto al que se le agregara la luz
+        Transform t = gameObject.transform.Find("shine");
+        GameObject brigth = null;
+        if (t == null)
+        {
+            brigth = new GameObject("shine");
+            brigth.AddComponent(typeof(Light));							//se le agrega la luz
+
+            brigth.transform.parent = transform;							//Se fija a la entidad
+            brigth.light.type = LightType.Spot;								//Se elije el tipo de luz SPOT
+
+            //Se pone la mira hacia abajo
+            brigth.transform.position = brigth.transform.parent.position + new Vector3(0, 3, 0);
+            brigth.transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
+
+            //Color, Alcance, Dispercion
+            brigth.light.color = Color.yellow;
+            brigth.light.range = 15.0f;
+            brigth.light.spotAngle = 20.0f;
+            brigth.light.intensity = 2.20f;
+        }
+        else
+        {
+            brigth = t.gameObject;
+        }
+    }
 }
