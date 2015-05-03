@@ -348,7 +348,7 @@ namespace Assets.My_Assets
 		protected bool IsMyLeader(GameObject l)
 		{
 			
-			if (l.GetInstanceID() == leader.GetInstanceID())
+			if (l!=null && leader!=null && l.GetInstanceID() == leader.GetInstanceID())
 				return true;
 			return false;
 		}
