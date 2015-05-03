@@ -107,7 +107,7 @@ namespace Assets.My_Assets
         /// <summary>
         // rank del dino (clase a la que pertenece A,B,C)
         /// </summary>
-        public char rank;
+        public string rank;
 
 		/// <summary>
 		// lista que contiene la manada a la que se es parte
@@ -354,11 +354,11 @@ namespace Assets.My_Assets
 
             if (Random.Range(0, 100) < 40)
             {
-                rank = 'A';
+                rank = "A";
             }
             else
             {
-                rank = 'B';
+                rank = "B";
             }
 			
 			//Fija los parametros iniciales en torno a la escala

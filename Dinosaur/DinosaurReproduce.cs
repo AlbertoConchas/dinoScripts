@@ -249,7 +249,7 @@ public class DinosaurReproduce : MonoBehaviour
         //Classify the herd 
 
         GameObject leader = child.GetComponent<Dinosaur>().getLeader();
-        leader.GetComponent<Dinosaur>().rank = 'A';
+        leader.GetComponent<Dinosaur>().rank = "A";
         float pa;
         float pb; 
 
@@ -266,10 +266,10 @@ public class DinosaurReproduce : MonoBehaviour
 
 
             if(pa > pb){
-                o.GetComponent<Dinosaur>().rank='A';
+                o.GetComponent<Dinosaur>().rank="A";
             }
             else{
-                o.GetComponent<Dinosaur>().rank='B';
+                o.GetComponent<Dinosaur>().rank="B";
             }
 
         }
