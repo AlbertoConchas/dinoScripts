@@ -42,9 +42,11 @@ public class Predator : Dinosaur {
 	// Update is called once per frame	
 	void Update () 
     {
-        if (state == States.Die) return;
 		if (!Metabolism()) 
 			return;
+
+        if (state == States.Die) return;
+
 
         actualNode = getActualPathNode();
 
@@ -78,6 +80,16 @@ public class Predator : Dinosaur {
 		} else if (state != States.ChoosingLeader) {
 
             /////////////////////////////////////////////////////////REPRODUCE
+			/// 
+			if(priority==Priorities.Reproduce && state==States.Waiting && repLapse <=0){
+				
+				state=States.Reproduce;
+				
+			}else if(priority==Priorities.Eat && state==States.Waiting){
+				
+				state=States.Eating;
+			}
+
             if (state == States.Reproduce)
             {
                 ////Debug.Log("Estado de reproduccion");
@@ -143,7 +155,7 @@ public class Predator : Dinosaur {
     void behavior_reproduce()
     {
         GetComponent<DinosaurReproduce>().findPartner();
-
+		repLapse = 60;
      
     }
 

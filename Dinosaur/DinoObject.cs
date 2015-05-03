@@ -13,7 +13,12 @@ namespace Assets.My_Assets
 		/// Salud de la entidad
 		/// </summary>
 		public float hp;
-		
+
+		/// <summary>
+		/// Salud maxima
+		/// </summary>
+		public float maxHp;
+
 		/// <summary>
 		/// Velocidad de la entidad
 		/// </summary>
@@ -152,7 +157,7 @@ namespace Assets.My_Assets
 			
 			if (state == States.Die)
 			{
-				flesh -= Time.deltaTime * (1 / 5f); //Putrefaccion
+				flesh -= Time.deltaTime * (5); //Putrefaccion
 				if (flesh <= 0)
 					Destroy(gameObject);
 				return false;
@@ -322,6 +327,7 @@ namespace Assets.My_Assets
 			
 			//Propiedades fijas
 			hp = 100f;
+			maxHp = 100f;
 			stamina = 100f;
 			lifetime = Random.Range(0, 500);
 			isNeededRun = false;

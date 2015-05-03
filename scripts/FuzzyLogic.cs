@@ -7,7 +7,7 @@ public class FuzzyLogic : MonoBehaviour{
 	double[] reproduce = new double[] {0,0,0,.4,.5,.5,.5,.4,0,0,0};//{0,0,0,.4,.7,1,.7,.4,0,0,0};
 	double[] eat = new double[] {0,0,0,0,0,.1,.4,.7,1,1,1};
 
-	public Dinosaur.Priorities calPriority(PathNode actualNode,double maxStamina,double maxLifetime,double stamina,double lifetime){
+	public Dinosaur.Priorities calPriority(PathNode actualNode,double maxStamina,double maxLifetime,double stamina,double lifetime,double hp,double maxHp){
 
 		/**
 		 *REEGLAS: 
@@ -18,7 +18,7 @@ public class FuzzyLogic : MonoBehaviour{
 		 *  3.1.- si hay muchos rivales y no se es viejo entonces corre.
 		 */
 
-		double regla1 = staminaBaja (stamina, maxStamina); //Math.Min (1,1-comer(1)+ staminaBaja(stamina,maxStamina));
+		double regla1 = Math.Max(staminaBaja(stamina, maxStamina),hpBajo(hp,maxHp)); //Math.Min (1,1-comer(1)+ staminaBaja(stamina,maxStamina));
 		double regla2 =  Math.Min(staminaAlta(stamina,maxStamina),adultez(lifetime,maxLifetime));
 		//double regla3 = Math.Min (1,/*1-correr(1)+*/Math.Max(rivalesAlto(actualNode.getPredators()),Math.Min(rivalesMedio(actualNode.getPredators()),Math.Max(vejez(lifetime,maxLifetime),companerosBajo(actualNode.getPrays())))));
 		double regla3 = Math.Min(rivalesMedio(actualNode.getPredators()),1-vejez(lifetime,maxLifetime));
@@ -311,6 +311,30 @@ public class FuzzyLogic : MonoBehaviour{
 		}
 
 	}
+
+	//HP
+	protected double hpBajo( double x , double maxHp){//  ¯¯¯¯¯¯\____
+		double hp=(x*100)/maxHp;//porcentaje de stamina
+		if(hp>=0 && hp<50){
+			return 1;
+		}else if(hp>=50 && hp<70){
+			return (70-hp)/20;
+		}else{
+			return 0;
+		}
+	}
+	protected double hpAlt( double x, double maxHp){ // _____/¯¯¯¯¯
+		double hp=(x*100)/maxHp;//porcentaje de stamina
+		if(hp>=0 && hp<50){
+			return 0;
+		}else if(hp>=50 && hp<70){
+			return (hp-50)/20;
+		}else{
+			return 1;
+		}
+		
+	}
+
    //ETAPAS DE VIDA  
 	protected double juventud( double x ,double maxLifetime ){  //  ¯¯¯¯¯¯\____
 		double life=(x*100)/maxLifetime;//porcentaje de stamina
