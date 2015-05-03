@@ -50,10 +50,10 @@ public class Prey : Dinosaur
 
     // Update is called once per frame	
     void Update()
-    {
-        if (state == States.Die) return;
+	{
 		if (!Metabolism())
 			return;
+		if (state == States.Die) return;
 
 
 
@@ -66,7 +66,7 @@ public class Prey : Dinosaur
 
         actualNode = getActualPathNode();
        // priority = priorities();
-		priority = fLogic.calPriority (actualNode, 100, 720, stamina, lifetime);
+		priority = fLogic.calPriority (actualNode, 100, 720, stamina, lifetime,hp,maxHp);
         memorize();
 
 		//Debug.Log (fLogic.calPriority(actualNode,100,maxLifeTime,stamina,lifetime));

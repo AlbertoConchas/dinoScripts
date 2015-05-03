@@ -43,7 +43,7 @@ public class DinosaurReproduce : MonoBehaviour
             }
         }
 		
-		Debug.Log(posiblePartner.Count);
+		//Debug.Log(posiblePartner.Count);
         if (posiblePartner.Count >= 1)
         {
             int num = random.Next(0, posiblePartner.Count);
@@ -193,7 +193,10 @@ public class DinosaurReproduce : MonoBehaviour
         //Daño que realiza la entidad
         child.GetComponent<Dinosaur>().attack = (a * GetComponent<Dinosaur>().attack) + ((1 - a) * partner.GetComponent<Dinosaur>().attack);
 
-       //Female
+		//Defense
+		child.GetComponent<Dinosaur>().defense = (a * GetComponent<Dinosaur>().defense) + ((1 - a) * partner.GetComponent<Dinosaur>().defense);
+
+		//Female
         if (random.Next(0, 100) < 50)
         {
             child.GetComponent<Dinosaur>().female = true;
