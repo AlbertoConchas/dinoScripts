@@ -38,8 +38,9 @@ public class Predator : Dinosaur {
 	
 	
 	// Update is called once per frame	
-	void Update () {
-
+	void Update () 
+    {
+        if (state == States.Die) return;
 		if (!Metabolism()) 
 			return;
 

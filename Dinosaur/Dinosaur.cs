@@ -349,7 +349,7 @@ public abstract class Dinosaur : DinoObject{
         {
             try
             {
-                if (memory == null) new Dictionary<Vector3, Remembrance>();
+                if (memory == null) memory = new Dictionary<Vector3, Remembrance>();
                 Node node = toNode(actualNode);
                 if (memory.ContainsKey(node.getPosition()))
                 {
