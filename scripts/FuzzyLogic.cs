@@ -292,20 +292,20 @@ public class FuzzyLogic : MonoBehaviour{
 	//STAMINA
 	protected double staminaBaja( double x , double maxSta){//  ¯¯¯¯¯¯\____
 		double stam=(x*100)/maxSta;//porcentaje de stamina
-		if(stam>=0 && stam<30){
+		if(stam>=0 && stam<50){
 			return 1;
-		}else if(stam>=30 && stam<70){
-			return (70-stam)/40;
+		}else if(stam>=50 && stam<70){
+			return (70-stam)/20;
 		}else{
 			return 0;
 		}
 	}
 	protected double staminaAlta( double x, double maxSta){ // _____/¯¯¯¯¯
 		double stam=(x*100)/maxSta;//porcentaje de stamina
-		if(stam>=0 && stam<30){
+		if(stam>=0 && stam<50){
 			return 0;
-		}else if(stam>=30 && stam<70){
-			return (stam-30)/40;
+		}else if(stam>=50 && stam<70){
+			return (stam-50)/20;
 		}else{
 			return 1;
 		}

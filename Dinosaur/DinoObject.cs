@@ -18,7 +18,12 @@ namespace Assets.My_Assets
 		/// Velocidad de la entidad
 		/// </summary>
 		public int speed;
-		
+
+		/// <summary>
+		/// Lapso entre reproducciones.
+		/// </summary>
+		public float repLapse;
+
 		/// <summary>
 		/// Rango de comunicacion
 		/// </summary>
@@ -171,6 +176,10 @@ namespace Assets.My_Assets
 					actualFood = null;
 				}
 			}
+
+			if (state != States.Reproduce && repLapse > 0) {
+				repLapse-=Time.deltaTime;			
+			}
 			
 			return true;
 		}
@@ -314,6 +323,7 @@ namespace Assets.My_Assets
 			isLeader = false;
 			mutation = 0.3f;
 			crossover = 0.5f;
+			repLapse = 60;
 			
 			//Propiedades variables
 			comRange = Random.Range(8, 12);

@@ -16,16 +16,16 @@ public class DinosaurReproduce : MonoBehaviour
 
     public void findPartner()
     {
-        StartCoroutine(startElection());
+       startElection();
     }
 
     public void selectPartner()
     {
-
+		posiblePartner.Clear ();
         //Find the other in state of Reproduce
         foreach (GameObject dino in gameObject.GetComponent<Dinosaur>().getHerd())
         {
-            if (dino.GetComponent<Dinosaur>().state == Dinosaur.States.Reproduce)
+			if (dino.GetComponent<Dinosaur>().state != Dinosaur.States.Die && dino.GetComponent<Dinosaur>().priority == Dinosaur.Priorities.Reproduce ) 
             {
                 //If is female
                 if (GetComponent<Dinosaur>().female && !dino.GetComponent<Dinosaur>().female)
@@ -42,7 +42,8 @@ public class DinosaurReproduce : MonoBehaviour
                 }
             }
         }
-
+		
+		Debug.Log(posiblePartner.Count);
         if (posiblePartner.Count >= 1)
         {
             int num = random.Next(0, posiblePartner.Count);
@@ -56,13 +57,14 @@ public class DinosaurReproduce : MonoBehaviour
 
         if (partner != null)
         {
-            gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Waiting;
             startReproduction();
             unbecomeReproduce();
+			gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Waiting;
         }
         else {
-            gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Waiting;
             unbecomeReproduce();
+			//Debug.Log(" No se reprodujo");
+			gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Waiting;
         }
 
             return;
@@ -245,11 +247,10 @@ public class DinosaurReproduce : MonoBehaviour
         return (random.Next(0,100)/100);
     
     }
-    private IEnumerator startElection()
+    private void startElection()
     {
         becomeReproduce();
         selectPartner();
-        yield return new WaitForSeconds(2);
     }
 
 
