@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Assets.My_Assets.dinoScripts.search;
 
 public class Predator : Dinosaur {
-
+	public bool debug = false;
 	
 	// Use this for initialization
 	void Start () {
@@ -85,15 +85,17 @@ public class Predator : Dinosaur {
 				
 				state=States.Reproduce;
 				
-			}else if(priority==Priorities.Eat && state==States.Waiting){
+			}else if((state==States.Waiting || state==States.Reproduce)&&priority==Priorities.Eat){
 				
 				state=States.Eating;
 			}
 
-            if (state == States.Reproduce)
-            {
-                ////Debug.Log("Estado de reproduccion");
-                behavior_reproduce();
+			if (state == States.Reproduce&& female)
+			{
+				if(debug)
+					Debug.Log("Aqui");
+				behavior_reproduce();
+				state = States.Waiting;
 
             }
 
@@ -155,7 +157,7 @@ public class Predator : Dinosaur {
     void behavior_reproduce()
     {
         GetComponent<DinosaurReproduce>().findPartner();
-		repLapse = 60;
+		//repLapse = 60;
      
     }
 
@@ -353,7 +355,17 @@ public class Predator : Dinosaur {
 	}
 	
 	
+	//pedimiento de reproduccion.. de la hembra hacia el macho
 	
+	void letsMakeAChild(GameObject g)
+	{
+		if (state == States.Reproduce && !female && repLapse<=0)
+		{
+			state=States.Waiting;
+			repLapse=60;
+			g.GetComponent<DinosaurReproduce>().Reproduce();
+		}
+	}
 	
 	///////////////////////////////////////////////////////////////
 	///////////////// Reacciones a ordenes del lider //////////////
