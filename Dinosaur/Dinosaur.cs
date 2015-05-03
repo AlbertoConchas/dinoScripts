@@ -97,6 +97,12 @@ public abstract class Dinosaur : DinoObject{
        return herd;
    }
 
+    private void OnDrawGizmosSelected() {
+        Gizmos.color = Color.red;
+         //Use the same vars you use to draw your Overlap SPhere to draw your Wire Sphere.
+         Gizmos.DrawWireSphere (transform.position, comRange);
+    }
+
    //actualiza la manada cuando alguien muere (en especial el lider) o cuando aun no se de que manada soy
   protected bool updateHerd<T>() where T:Dinosaur
    {
@@ -133,6 +139,13 @@ public abstract class Dinosaur : DinoObject{
             return true;
         }
 
+        //quitar dinos muertos del inRangeHerd!
+        GameObject[] array = (GameObject[])inRangeHerd.ToArray();
+        foreach (GameObject deadDino in array) 
+        {
+            if (deadDino.GetComponent<Dinosaur>().state == Dinosaur.States.Die) inRangeHerd.Remove(deadDino);
+        }
+
 
         if (herd.Count == 0) // no habia manada
         {
@@ -162,7 +175,7 @@ public abstract class Dinosaur : DinoObject{
 
   protected  bool isOnRangeToStop()
   {
-      return isOnRangeToStop(1f);
+      return isOnRangeToStop(3f);
   }
 
   protected bool isOnRangeToStop(float factor)
@@ -336,6 +349,7 @@ public abstract class Dinosaur : DinoObject{
         {
             try
             {
+                if (memory == null) memory = new Dictionary<Vector3, Remembrance>();
                 Node node = toNode(actualNode);
                 if (memory.ContainsKey(node.getPosition()))
                 {
