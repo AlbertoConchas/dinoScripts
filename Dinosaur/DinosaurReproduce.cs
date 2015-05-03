@@ -253,9 +253,6 @@ public class DinosaurReproduce : MonoBehaviour
     }
 
 
-
-
-
     /**
     * Consegui ser lider, crea la luz encima de el
     **/

@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
 public class PathNode : MonoBehaviour {
 
 	public GameObject[] nodeNeighbors;
+    public string[] plants = { "Bush5", "Shrub_01", "Shrub_02", "Shrub_03", "Shrub_04", "Weeds_01", "Weeds_02", "Weeds_03", "Weeds_04","Weeds_05","tree" };
+
 	public Font font;
     public GameObject forest;
 
@@ -154,9 +157,21 @@ public class PathNode : MonoBehaviour {
 
 	private void plantTree(){
 		Vector3 randPos = randomPosition();
-		GameObject g = (GameObject)Instantiate(Resources.LoadAssetAtPath("Assets/My Assets/Prefab/tree.prefab", typeof(GameObject)), randPos , Quaternion.identity);
+
+        int num = Random.Range(0, plants.Length); ;
+        string plant = plants[num];
+
+		GameObject g = (GameObject)Instantiate(Resources.LoadAssetAtPath("Assets/My Assets/Prefab/"+plant+".prefab", typeof(GameObject)), randPos , Quaternion.identity);
 		g.name = "tree";
         g.transform.parent = forest.transform;
+
+
+        if (Random.Range(0, 1000) < 20) {
+            GameObject x = (GameObject)Instantiate(Resources.LoadAssetAtPath("Assets/My Assets/Prefab/VolumeSteam 1.prefab", typeof(GameObject)), randPos, Quaternion.identity);
+            x.name = "niebla";
+            x.transform.parent = forest.transform;
+        }
+
 	}
 
 	/*
