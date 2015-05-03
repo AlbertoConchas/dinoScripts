@@ -224,6 +224,7 @@ public class DinosaurReproduce : MonoBehaviour
         //Agregar a la manada de la mama el hijo
         momHerd.Add(child);
 
+        
         //Si el hijo es mejor que el lider actual
         if (child.GetComponent<Dinosaur>().getLeadershipStat() > GetComponent<Dinosaur>().getLeader().GetComponent<Dinosaur>().getLeadershipStat())
         {
@@ -240,7 +241,36 @@ public class DinosaurReproduce : MonoBehaviour
 
 
         }
-        
+
+
+        //Classify the herd 
+
+        GameObject leader = child.GetComponent<Dinosaur>().getLeader();
+        leader.GetComponent<Dinosaur>().rank = 'A';
+        float pa;
+        float pb; 
+
+        foreach (GameObject o in leader.GetComponent<Dinosaur>().herd)
+        {
+            
+            float ml= ((o.GetComponent<Dinosaur>().getLeadershipStat() * 100) / leader.GetComponent<Dinosaur>().getLeadershipStat());
+
+            float px= (ml*0.2f * 0.4f) + (ml*0.35f *0.6f);
+
+            pa = (ml * 0.2f * 0.4f * 0.4f) / px;
+
+            pb = (ml * 0.35f * 0.6f * 0.6f) / px;
+
+
+            if(pa > pb){
+                o.GetComponent<Dinosaur>().rank='A';
+            }
+            else{
+                o.GetComponent<Dinosaur>().rank='B';
+            }
+
+        }
+
     }
 
     private float generateRandom(){

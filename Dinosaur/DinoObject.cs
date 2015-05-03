@@ -98,7 +98,12 @@ namespace Assets.My_Assets
 		// sexo del dino (true si es muchachita)
 		/// </summary>
 		public bool female;
-		
+
+        /// <summary>
+        // rank del dino (clase a la que pertenece A,B,C)
+        /// </summary>
+        public char rank;
+
 		/// <summary>
 		// lista que contiene la manada a la que se es parte
 		/// </summary>
@@ -340,6 +345,15 @@ namespace Assets.My_Assets
 			{
 				female = false;
 			}
+
+            if (Random.Range(0, 100) < 40)
+            {
+                rank = 'A';
+            }
+            else
+            {
+                rank = 'B';
+            }
 			
 			//Fija los parametros iniciales en torno a la escala
 			comRange = (int)(comRange * ((float)transform.localScale.x / 0.3));
