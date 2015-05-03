@@ -10,17 +10,17 @@ public class Prey : Dinosaur
     //Enum Para los estados del seguidor
 
 
+
     // Use this for initialization
     void Start()
     {
         becomePrey();
-
 		if( fLogic == null )
 			setFuzzyLogic();
 
         base.start();//Init Dinosaur
 
-        flesh = 500f;
+        //flesh = 500f;
         updateHerd<Prey>();
 
         state = States.ChoosingLeader;
@@ -52,9 +52,10 @@ public class Prey : Dinosaur
     void Update()
     {
         if (state == States.Die) return;
-
 		if (!Metabolism())
-            return;
+			return;
+
+
 
         
 		if (runningTime > 0 && priority == Priorities.Run)
@@ -111,6 +112,8 @@ public class Prey : Dinosaur
             state = States.Searching;
 
         }
+
+
         // si el lider ya no existe o esta muerto y ademas no se esta seleccionando lider
         else if ((leader == null || leader.GetComponent<Prey>().state == Prey.States.Die) && state != States.ChoosingLeader)
         {
@@ -129,11 +132,20 @@ public class Prey : Dinosaur
 
             /////////////////////////////////////////////////////////REPRODUCE
             
+			if(priority==Priorities.Reproduce && state==States.Waiting && repLapse <=0){
+
+				state=States.Reproduce;
+
+			}else if(priority==Priorities.Eat && state==States.Waiting){
+
+				state=States.Eating;
+			}
+
             if (state == States.Reproduce)
             {
-                ////Debug.Log("Estado de reproduccion");
+				Debug.Log("Aqui");
                 behavior_reproduce();
-                
+				state = States.Waiting;
             }
 
             //LEADER BEHAVIOR 
@@ -222,7 +234,7 @@ public class Prey : Dinosaur
     void behavior_reproduce()
     {
         GetComponent<DinosaurReproduce>().findPartner();
-      
+		repLapse = 60;
     }
 
 
@@ -283,7 +295,7 @@ public class Prey : Dinosaur
         }
 
         nav.destination = actualFood.transform.position;
-        if (DistanceFromDestination() <= distanceToBite())
+        if (DistanceFromDestination() <= DistanceToBite(true))
         {
             nav.destination = transform.position;
             transform.LookAt(actualFood.transform);
@@ -294,7 +306,7 @@ public class Prey : Dinosaur
             }
             else
             {
-                biteEnemy();
+				BiteEnemy(true);
             }
         }
     }
@@ -309,7 +321,7 @@ public class Prey : Dinosaur
             return;
         }
 
-        eatEnemy();
+        EatEnemy(true);
         if (actualFood.GetComponent<Plant>().flesh < 0)
         {
             this.GetComponent<DinasorsAnimationCorrector>().idle();
@@ -387,7 +399,7 @@ public class Prey : Dinosaur
         nav.stoppingDistance = 0;
         //nav.stoppingDistance = distanceToBite();
         nav.destination = actualFood.transform.position;
-        if (DistanceFromDestination() <= distanceToBite())
+        if (DistanceFromDestination() <= DistanceToBite(true))
         {
 
             nav.destination = transform.position;
@@ -398,7 +410,7 @@ public class Prey : Dinosaur
             }
             else
             {
-                biteEnemy();
+                BiteEnemy(true);
             }
         }
 
@@ -414,7 +426,7 @@ public class Prey : Dinosaur
             return;
         }
 
-        eatEnemy();
+        EatEnemy(true);
         if (actualFood.GetComponent<Plant>().flesh < 0)
         {
             this.GetComponent<DinasorsAnimationCorrector>().idle();
@@ -574,103 +586,7 @@ public class Prey : Dinosaur
             state = States.Hiding;
 
     }
-
-
-    private Priorities priorities()
-    {
-       
-        if (actualNode.getPredators() > 0 || state == States.Hiding)
-        {
-            runningTime = 200;
-            return Priorities.Run;
-        }
-        else if (hungry())
-        {
-            return Priorities.Eat;
-        }
-        else if (mature())
-        {
-            return Priorities.Reproduce;
-        }
-        return Priorities.Obey;
-    }
-
-
-    private bool mature()
-    {
-        if (lifetime <= 5000f && lifetime > 1000f)
-            return true;
-        return false;
-    }
-    /**
-     *	Funciones Biologicas de consumir energia
-     *
-    private bool metabolism()
-    {
-        float factor = 1f;
-        this.lifetime -= 0.007f * factor;
-
-        if (priority == Priorities.Run)
-            factor *= 2f;
-
-
-        if (state == States.Die)
-        {
-            if (this.flesh <= 0)
-                Destroy(gameObject);
-            return false;
-        }
-        if (0 < this.stamina)
-        {
-            this.stamina -= 0.001 * factor;
-        }
-        if (stamina <= 0)
-        {
-            if (0 < this.hp)
-            {
-                this.hp -= 0.001f * factor;
-            }
-        }
-        if (this.hp <= 0)
-        {
-            die();
-            return false;
-        }
-        return true;
-    }*/
-
-
-    //Mueve las estadisticas del enemigo y del agente
-    void eatEnemy()
-    {
-        actualFood.GetComponent<Plant>().flesh -= (float)this.attack / (1f / Time.deltaTime);
-        if (this.stamina < 100f)
-            this.stamina += ((float)this.attack / (1f / Time.deltaTime));
-        else
-            this.hp += ((float)this.attack / (1f / Time.deltaTime)) * 0.5f;
-    }
-
-    /**
-     * Distancia Optima para atacar al enemigo actual
-     */
-    float distanceToBite()
-    {
-        return ((nav.radius) * transform.localScale.x * 1.3f) +
-            ((actualFood.GetComponent<MeshRenderer>().bounds.size.x) * 1.3f);
-    }
-
-
-    /**
-     * Funcion que inflige daño al enemigo
-     */
-    void biteEnemy()
-    {
-        actualFood.GetComponent<Plant>().hp -= this.attack / (1f / Time.deltaTime);
-    }
-
-
-
-
+	
     /**
      **Recive un arreglo de GameObject y regresa el mas cercano a la posicion actual
      */
@@ -779,9 +695,7 @@ public class Prey : Dinosaur
 		
 		return nodesData;
 	}
-
-
-  
+   
     public void becomePrey()
     {
 
@@ -811,5 +725,4 @@ public class Prey : Dinosaur
             brigth = t.gameObject;
         }
     }
-
 }

@@ -9,17 +9,6 @@ using Assets.My_Assets.dinoScripts.Dinosaur;
 using Assets.My_Assets;
 
 public abstract class Dinosaur : DinoObject{
-   /* //public Transform m_Prey;
-    public float hp = 100f;			//Salud de la entidad*/
-   // public int np = 10;			//Nutricion aportada a quien se alimente de la entidad
-  /*  public int speed = 2;			//Velocidad de la entidad
-    public int comRange = 10;			//Rango de comunicacion
-    public double stamina = 100f;			//Resistencia (nesesaria para correr etc....)
-    public float lifetime = 10000f;		//Tiempo de vida
-    public float attack = 10f;			//Daño que realiza la entidad
-    public float flesh = 200f;
-	public bool female;
-    public States state;*/
     public float leadership;
 	public Priorities priority;
 	
@@ -104,33 +93,15 @@ public abstract class Dinosaur : DinoObject{
     // -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-    /*
- * Funcion para enviar a todos los objetos cercanos
- * string Messaage: Funcion que sera ejecutada en los objetos encontrados
- * object obj: Parametros para enviar a esa funcion
- *
-   public void BroadCast(string message, object obj)
-    {
-        herd.Remove(null);
-       	if(herd.Count>0)
-        foreach (GameObject dino in herd)
-        {
-            if (dino != null || dino.GetComponent<Dinosaur>().state != States.Die)
-            {
-				dino.SendMessage(message, (GameObject)obj);
-            }
-            else
-            {
-                //herd.Remove(dino);
-            }
-            
-        }
-    }*/
    public List<GameObject> getHerd() {
        return herd;
    }
+
+    private void OnDrawGizmosSelected() {
+        Gizmos.color = Color.red;
+         //Use the same vars you use to draw your Overlap SPhere to draw your Wire Sphere.
+         Gizmos.DrawWireSphere (transform.position, comRange);
+    }
 
    //actualiza la manada cuando alguien muere (en especial el lider) o cuando aun no se de que manada soy
   protected bool updateHerd<T>() where T:Dinosaur
@@ -168,6 +139,13 @@ public abstract class Dinosaur : DinoObject{
             return true;
         }
 
+        //quitar dinos muertos del inRangeHerd!
+        GameObject[] array = (GameObject[])inRangeHerd.ToArray();
+        foreach (GameObject deadDino in array) 
+        {
+            if (deadDino.GetComponent<Dinosaur>().state == Dinosaur.States.Die) inRangeHerd.Remove(deadDino);
+        }
+
 
         if (herd.Count == 0) // no habia manada
         {
@@ -197,7 +175,7 @@ public abstract class Dinosaur : DinoObject{
 
   protected  bool isOnRangeToStop()
   {
-      return isOnRangeToStop(1f);
+      return isOnRangeToStop(3f);
   }
 
   protected bool isOnRangeToStop(float factor)
@@ -371,6 +349,7 @@ public abstract class Dinosaur : DinoObject{
         {
             try
             {
+                if (memory == null) memory = new Dictionary<Vector3, Remembrance>();
                 Node node = toNode(actualNode);
                 if (memory.ContainsKey(node.getPosition()))
                 {
