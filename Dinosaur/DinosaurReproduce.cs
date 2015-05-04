@@ -28,14 +28,14 @@ public class DinosaurReproduce : MonoBehaviour
 			if (dino.GetComponent<Dinosaur>().state != Dinosaur.States.Die && dino.GetComponent<Dinosaur>().priority == Dinosaur.Priorities.Reproduce ) 
             {
                 //If is female
-                if (GetComponent<Dinosaur>().female && !dino.GetComponent<Dinosaur>().female)
+                if (GetComponent<Dinosaur>().female && !dino.GetComponent<Dinosaur>().female && dino.GetComponent<DinosaurReproduce>().partner==null)
                 {
                     posiblePartner.Add(dino);
                 }
                 else
                 {
                     //If is a male
-                    if (!GetComponent<Dinosaur>().female && dino.GetComponent<Dinosaur>().female)
+                    if (!GetComponent<Dinosaur>().female && dino.GetComponent<Dinosaur>().female && dino.GetComponent<DinosaurReproduce>().partner == null)
                     {
                         posiblePartner.Add(dino);
                     }
@@ -59,6 +59,7 @@ public class DinosaurReproduce : MonoBehaviour
         {
             startReproduction();
             unbecomeReproduce();
+            partner = null;
 			gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Waiting;
         }
         else {
