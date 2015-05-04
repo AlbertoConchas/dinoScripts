@@ -27,55 +27,6 @@ public class DinosaurReproduce : MonoBehaviour
 		foreach (GameObject dino in gameObject.GetComponent<Dinosaur>().getHerd())
 		{
 			if (dino.GetComponent<Dinosaur>().state != Dinosaur.States.Die && dino.GetComponent<Dinosaur>().priority == Dinosaur.Priorities.Reproduce ) 
-
-            {
-                //If is female
-                if (GetComponent<Dinosaur>().female && !dino.GetComponent<Dinosaur>().female && dino.GetComponent<DinosaurReproduce>().partner==null)
-                {
-                    posiblePartner.Add(dino);
-                }
-                else
-                {
-                    //If is a male
-                    if (!GetComponent<Dinosaur>().female && dino.GetComponent<Dinosaur>().female && dino.GetComponent<DinosaurReproduce>().partner == null)
-                    {
-                        posiblePartner.Add(dino);
-                    }
-                }
-            }
-        }
-		
-		//Debug.Log(posiblePartner.Count);
-        if (posiblePartner.Count >= 1)
-        {
-            int num = random.Next(0, posiblePartner.Count);
-            partner= posiblePartner[num];
-
-        }
-        else {
-            partner = null;
-        }
-
-
-        if (partner != null)
-        {
-            startReproduction();
-            unbecomeReproduce();
-            partner = null;
-			gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Waiting;
-        }
-        else {
-            unbecomeReproduce();
-			//Debug.Log(" No se reprodujo");
-			gameObject.GetComponent<Dinosaur>().state = Dinosaur.States.Waiting;
-        }
-
-            return;
-    }
-
-
-    /**
-=======
 			{
 				//If is female
 				if (dino !=null && !dino.GetComponent<Dinosaur>().female && dino.GetComponent<Dinosaur>().repLapse<=0)
@@ -120,7 +71,6 @@ public class DinosaurReproduce : MonoBehaviour
 		partner = null;
 	}
 		/**
->>>>>>> 6f537e86b80a3568e339cafdee2b53ab0e4d657a
      * Consegui ser pareja, crea la luz encima de el
      **/
 		private void startReproduction()
