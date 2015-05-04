@@ -63,7 +63,7 @@ public abstract class Dinosaur : DinoObject{
     public void setLeader(GameObject l)
     {
         leader = l;
-        nav.avoidancePriority = 1;
+   //     nav.avoidancePriority = 1;
         state = States.Waiting;
     }
 

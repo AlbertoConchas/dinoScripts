@@ -7,6 +7,7 @@ public class Prey : Dinosaur
 {
     public int runningTime = 200;
 	private FuzzyLogic fLogic;
+	public bool debug = false;
     //Enum Para los estados del seguidor
 
 
@@ -135,15 +136,20 @@ public class Prey : Dinosaur
 			if(priority==Priorities.Reproduce && state==States.Waiting && repLapse <=0){
 
 				state=States.Reproduce;
+				//repLapse = 60;
 
-			}else if(priority==Priorities.Eat && state==States.Waiting){
-
-				state=States.Eating;
+			}else if((state==States.Waiting || state==States.Reproduce)&&priority==Priorities.Eat ){
+				if(actualFood==null){//si no tiene comida caza
+					state=States.Hunting;
+				}else{
+					state=States.Eating;
+				}
 			}
 
-            if (state == States.Reproduce)
+            if (state == States.Reproduce && female)
             {
-				Debug.Log("Aqui");
+				if(debug)
+					Debug.Log("Aqui");
                 behavior_reproduce();
 				state = States.Waiting;
             }
@@ -234,7 +240,6 @@ public class Prey : Dinosaur
     void behavior_reproduce()
     {
         GetComponent<DinosaurReproduce>().findPartner();
-		repLapse = 60;
     }
 
 
@@ -481,8 +486,22 @@ public class Prey : Dinosaur
         BroadCast("SaysPanic", l);
     }
 
-    ///////////////////////////////////////////////////////////////
-    ///////////////// Reacciones a ordenes del lider //////////////
+
+	//pedimiento de reproduccion.. de la hembra hacia el macho
+
+	void letsMakeAChild(GameObject g)
+	{
+		if (state == States.Reproduce && !female && repLapse<=0)
+		{
+			state=States.Waiting;
+			repLapse=60;
+			g.GetComponent<DinosaurReproduce>().Reproduce();
+		}
+	}
+	
+	
+	///////////////////////////////////////////////////////////////
+	///////////////// Reacciones a ordenes del lider //////////////
     ///////////////////////////////////////////////////////////////
     void LeaderSaysFollowMe(GameObject l)
     {
