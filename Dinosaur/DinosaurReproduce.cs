@@ -20,6 +20,7 @@ public class DinosaurReproduce : MonoBehaviour
             startElection();
     }
 
+<<<<<<< HEAD
     public void selectPartner()
     {
         posiblePartner.Clear();
@@ -86,6 +87,73 @@ public class DinosaurReproduce : MonoBehaviour
 
     private void mutation(float p)
     {
+=======
+	public void selectPartner()
+	{
+		posiblePartner.Clear ();
+		//Find the other in state of Reproduce
+		foreach (GameObject dino in gameObject.GetComponent<Dinosaur>().getHerd())
+		{
+			if (dino.GetComponent<Dinosaur>().state != Dinosaur.States.Die && dino.GetComponent<Dinosaur>().priority == Dinosaur.Priorities.Reproduce ) 
+			{
+				//If is female
+				if (dino !=null && !dino.GetComponent<Dinosaur>().female && dino.GetComponent<Dinosaur>().repLapse<=0)
+				{
+					posiblePartner.Add(dino);
+				}
+				/*else
+				{
+
+					//If is a male
+					if (!GetComponent<Dinosaur>().female && dino.GetComponent<Dinosaur>().female && dino.GetComponent<DinosaurReproduce>().partner == null)
+					{
+						posiblePartner.Add(dino);
+					}
+				}*/ 	
+			}
+		}
+		
+		//Debug.Log(posiblePartner.Count);
+		if (posiblePartner.Count >= 1)
+		{
+			int num = random.Next(0, posiblePartner.Count);
+			partner= posiblePartner[num];
+			
+		}
+		else {
+			partner = null;
+		}
+		
+		
+		if (partner != null)
+		{
+			//say
+			partner.SendMessage("letsMakeAChild",gameObject);
+			gameObject.GetComponent<Dinosaur>().repLapse=60;
+		}
+	}
+		
+	public void Reproduce(){
+		startReproduction();
+		unbecomeReproduce();
+		partner = null;
+	}
+		/**
+     * Consegui ser pareja, crea la luz encima de el
+     **/
+		private void startReproduction()
+		{
+			
+			if (GetComponent<Dinosaur>().female)
+			{
+				crossover(GetComponent<Dinosaur>().crossover);
+				mutation(GetComponent<Dinosaur>().mutation);
+			}
+		}
+		
+		private void mutation(float p)
+    { 
+>>>>>>> 6f42574bcef7fad535a6b626a0ee42d5cbefcba1
         //Genotipe Uniform
 
 
