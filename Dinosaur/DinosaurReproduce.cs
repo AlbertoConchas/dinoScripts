@@ -163,8 +163,8 @@ public class DinosaurReproduce : MonoBehaviour
                                     }
 
 
-
-        child = (GameObject)Instantiate(Resources.LoadAssetAtPath(path, typeof(GameObject)), partner.GetComponent<Rigidbody>().position, Quaternion.identity);
+        Vector3 pos = new Vector3(GetComponent<Rigidbody>().position.x + 5f, GetComponent<Rigidbody>().position.y+5f, GetComponent<Rigidbody>().position.z);
+        child = (GameObject)Instantiate(Resources.LoadAssetAtPath(path, typeof(GameObject)), pos, Quaternion.identity);
         var dinoChild = child.GetComponent<Dinosaur>();
         var mama = GetComponent<Dinosaur>();
 
@@ -311,11 +311,11 @@ public class DinosaurReproduce : MonoBehaviour
     {
 
         //Crea el objeto al que se le agregara la luz
-        Transform t = gameObject.transform.Find("shine");
+        Transform t = gameObject.transform.Find("shiner");
         GameObject brigth = null;
         if (t == null)
         {
-            brigth = new GameObject("shine");
+            brigth = new GameObject("shiner");
             brigth.AddComponent(typeof(Light));							//se le agrega la luz
 
             brigth.transform.parent = transform;							//Se fija a la entidad
@@ -346,7 +346,7 @@ public class DinosaurReproduce : MonoBehaviour
     public void unbecomeReproduce()
     {
         //encuentra el objeto al que se le agregara la luz
-        Transform t = gameObject.transform.Find("shine");
+        Transform t = gameObject.transform.Find("shiner");
         if (t == null) return;
         else
         {
