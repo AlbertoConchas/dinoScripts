@@ -2,12 +2,19 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Assets.My_Assets.dinoScripts.search;
+using Assets.My_Assets.dinoScripts.search.bayesiannetwork;
+using Assets.My_Assets.dinoScripts.Dinosaur;
 
 public class Prey : Dinosaur
 {
     public int runningTime = 200;
 	private FuzzyLogic fLogic;
 	public bool debug = false;
+
+    //Heuristic objects
+    private BayesianFactory byfactory;
+    private PearlsMessagePassing pearls;
+
     //Enum Para los estados del seguidor
 
 
@@ -676,9 +683,89 @@ public class Prey : Dinosaur
         return g[Random.Range(0, g.Length - 1)];
     }
 
+    /// <summary>
+    /// Method that Dinosaur uses in order to know if node is Goal in the searching for this type.
+    /// </summary>
+    /// <param name="node">The node</param>
+    /// <returns>true if is node is goal for this type of Dinosaur. false otherwise.</returns>
     override protected bool isGoal(Node node)
     {
         return (node.getPlants() > 0);
+    }
+
+    /// <summary>
+    /// The heuristic for an especific. Actual implementation is bayesian network.
+    /// </summary>
+    /// <param name="node">The node</param>
+    /// <returns>h value for node</returns>
+    override protected float getH(Node node)
+    {
+        //Initial h
+        float h = node.getFertility();
+
+        //Initialize if needed
+        if (byfactory == null)
+        {
+            byfactory = new BayesianFactory(this);
+        }
+        if (pearls == null)
+        {
+            pearls = new PearlsMessagePassing();
+        }
+
+        //Get memory events in order to update bayesian network
+        Remembrance remembrance = null;
+        try
+        {
+            remembrance = memory[node.getPosition()];
+        }
+        catch (KeyNotFoundException) { }
+        if (remembrance != null)
+        {
+            BayesianNode[] nodes = byfactory.createBayNet();
+            pearls.initial_tree(ref nodes, ref nodes[0]);
+
+            List<string> a = new List<string>();
+
+            //Do something with memory
+
+            //There was Predators
+            if (remembrance.getNode().getPredators() > 0)
+            {
+                pearls.update_tree(ref nodes, ref nodes[0], "D", "d1");
+                a.Add("d1");
+            }
+            else
+            {
+                pearls.update_tree(ref nodes, ref nodes[0], "D", "d2");
+                a.Add("d2");
+            }
+
+            //There was Food
+            if (remembrance.getNode().getPlants() > 0)
+            {
+                pearls.update_tree(ref nodes, ref nodes[0], "C", "c1");
+                a.Add("c1");
+            }
+            else
+            {
+                pearls.update_tree(ref nodes, ref nodes[0], "C", "c2");
+                a.Add("c2");
+            }
+
+            foreach (string aval in a)
+            {
+                h = 0f;
+                try
+                {
+                    h += pearls.getNode(ref nodes, "S1").Values["s1"].Probs[aval] * 10;
+                    h += pearls.getNode(ref nodes, "S2").Values["s2"].Probs[aval] * 10;
+                }
+                catch (KeyNotFoundException) { }
+                
+            }
+        }
+        return h;
     }
 
     IEnumerator preyGrow()

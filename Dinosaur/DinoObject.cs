@@ -2,7 +2,6 @@
 using Random = UnityEngine.Random;
 using System.Collections;
 using System.Collections.Generic;
-
 namespace Assets.My_Assets
 {
     public abstract class DinoObject : MonoBehaviour

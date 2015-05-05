@@ -5,6 +5,7 @@ using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using Assets.My_Assets.dinoScripts.search;
+using Assets.My_Assets.dinoScripts.search.bayesiannetwork;
 using Assets.My_Assets.dinoScripts.Dinosaur;
 using Assets.My_Assets;
 
@@ -31,10 +32,6 @@ public abstract class Dinosaur : DinoObject{
 
     private bool requestResponded;
     private GameObject tempLeader;
-
-    //Search
-    //private BinaryHeap<Node> open;//A* pathfinding
-    //private HashSet<Node> closed;//A* pathfinding
 
     public enum Priorities {Eat, Obey, Reproduce, Run};
 
@@ -297,17 +294,6 @@ public abstract class Dinosaur : DinoObject{
         return neighbourhood;
     }
 
-    /// <summary>
-    /// Gets the h.
-    /// </summary>
-    /// <returns>The h.</returns>
-    /// <param name="n">N.</param>
-    private float getH(Node n)
-    {
-        float h = n.getFertility();
-        return h;
-    }
-
     protected Vector3 searchForFood()
     {
         //init data structures if needed
@@ -344,6 +330,14 @@ public abstract class Dinosaur : DinoObject{
     }
 
     protected abstract bool isGoal(Node node);
+
+    protected abstract float getH(Node node);
+
+    /*private float getH(Node n)
+    {
+        float h = n.getFertility();
+        return h;
+    }*/
 
     //=============Memory functions=================
     protected void memorize()
