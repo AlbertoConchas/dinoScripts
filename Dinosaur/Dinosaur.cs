@@ -123,6 +123,7 @@ public abstract class Dinosaur : DinoObject{
         List<GameObject> dead = new List<GameObject>();
 
         /*checar si hay alguien muerto y sacarlo de la manada*/
+        herd.RemoveAll(item => item == null);
         foreach(GameObject dino in herd)
         {
             if (inRangeHerd.Contains(dino) && dino.GetComponent<Dinosaur>().state == States.Die) 

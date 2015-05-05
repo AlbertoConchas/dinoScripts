@@ -18,7 +18,15 @@ public class Predator : Dinosaur {
 
         base.start();//Init Dinosaur
 
-		state = States.ChoosingLeader;
+        if (leader == null)
+        {
+            state = States.ChoosingLeader;
+            GetComponent<LeaderChoosing>().choose();
+        }
+        else
+        {
+            lifetime = 0;
+        }
         updateHerd<Predator>();
 
 		//Fija los parametros iniciales en torno a la escala
@@ -27,18 +35,8 @@ public class Predator : Dinosaur {
 		this.stoppingDistance = travelStopDistance ();
 		
 		//Inicializa el NavMeshAgent
-		nav = GetComponent<NavMeshAgent> ();
-		
+		nav = GetComponent<NavMeshAgent> ();		
 		nav.speed = Velocidad (isNeededRun);
-
-
-        //Si no cuenta con eleccion de lider, el es el lider
-        if (GetComponent<LeaderChoosing>() == null)
-            setLeader(gameObject);
-        else
-        {
-            GetComponent<LeaderChoosing>().choose();
-        }
         
         //Inicia corrutina de crecimiento
         StartCoroutine("predatorGrow");
@@ -600,7 +598,7 @@ public class Predator : Dinosaur {
 
     IEnumerator predatorGrow()
     {
-        while (gameObject.transform.localScale.x < 1)
+        while (gameObject.transform.localScale.x < 1 && state!=States.Die)
         {
             gameObject.transform.localScale = new Vector3((float)(gameObject.transform.localScale.x + 0.005),
                                                           (float)(gameObject.transform.localScale.y + 0.005),

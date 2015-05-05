@@ -31,7 +31,16 @@ public class Prey : Dinosaur
         //flesh = 500f;
         updateHerd<Prey>();
 
-        state = States.ChoosingLeader;
+        if (leader == null)
+        {
+            state = States.ChoosingLeader;
+            GetComponent<LeaderChoosing>().choose();
+        }
+        else 
+        { 
+            lifetime = 0;
+        }
+
         //Fija los parametros iniciales en torno a la escala
         comRange = (int)(comRange * ((float)transform.localScale.x / 0.3));
         this.stoppingDistance = travelStopDistance();
@@ -39,18 +48,7 @@ public class Prey : Dinosaur
         //Inicializa el NavMeshAgent
         nav = GetComponent<NavMeshAgent>();
 
-		nav.speed =Velocidad(false);
-        /*if(isNeededRun)
-            nav.speed = (float)((stamina/100f)*speed)*3;
-        */
-        //Si no cuenta con eleccion de lider, el es el lider
-        if (GetComponent<LeaderChoosing>() == null)
-            setLeader(gameObject);
-        else
-        {
-            GetComponent<LeaderChoosing>().choose();
-        }
-        
+		nav.speed =Velocidad(false);        
         StartCoroutine("preyGrow");
 
     }
@@ -302,6 +300,7 @@ public class Prey : Dinosaur
             if (actualFood == null)
             {
                 state = States.Searching;
+                return;
                 //order_stop(gameObject);
             }
         }
@@ -770,7 +769,7 @@ public class Prey : Dinosaur
 
     IEnumerator preyGrow()
     {
-        while (gameObject.transform.localScale.x < 1)
+        while (gameObject.transform.localScale.x < 1 && state!=States.Die)
         {
             gameObject.transform.localScale = new Vector3((float)(gameObject.transform.localScale.x + 0.005),
                                                           (float)(gameObject.transform.localScale.y + 0.005),
