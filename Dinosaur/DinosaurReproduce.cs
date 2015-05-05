@@ -225,7 +225,10 @@ public class DinosaurReproduce : MonoBehaviour
         // Agrega al hijo a  cada miembro de la manada
         foreach (GameObject o in momHerd)
         {
-            o.GetComponent<Dinosaur>().herd.Add(child);
+            if (o != null && o.GetComponent<Dinosaur>().herd!=null) 
+            { 
+                o.GetComponent<Dinosaur>().herd.Add(child);
+            }
         }
 
         //Agregar a la manada de la mama el hijo
@@ -243,7 +246,10 @@ public class DinosaurReproduce : MonoBehaviour
             //Informarlo a la manada
             foreach (GameObject o in child.GetComponent<Dinosaur>().herd)
             {
-                o.GetComponent<Dinosaur>().setLeader(child);
+                if (o != null)
+                {
+                    o.GetComponent<Dinosaur>().setLeader(child);
+                }
             }
 
 

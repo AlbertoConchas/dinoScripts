@@ -202,23 +202,37 @@ public class LeaderChoosing : MonoBehaviour {
                     // el dino nuevo es lider de su manada y podemos unir manadas!
                     if (newDino.getLeader() != null && newDino.getLeader().GetInstanceID() == newDinoObject.GetInstanceID()) 
                     {
-
-                        // agregar dinos externos y lider externo a mi manada
-                        foreach (GameObject dinoObject in me.herd) 
+                        if (newDino.herd != null) 
                         {
-                            Dinosaur dino = dinoObject.GetComponent<Dinosaur>();
-                            dino.herd.AddRange(newDino.herd);
-                            dino.herd.Add(newDinoObject);
+                            newDino.herd.RemoveAll(item => item == null);
+                            // agregar dinos externos y lider externo a mi manada
+                            foreach (GameObject dinoObject in me.herd) 
+                            {
+                                if (dinoObject != null) 
+                                { 
+                                    Dinosaur dino = dinoObject.GetComponent<Dinosaur>();
+                                    dino.herd.AddRange(newDino.herd);
+                                    dino.herd.Add(newDinoObject);
+                                }
+                            }
                         }
 
-                        // agregar a mi y mis dinos a manada externa
-                        foreach (GameObject dinoObject in newDino.herd)
+                        if (me.herd != null) 
                         {
-                            Dinosaur dino = dinoObject.GetComponent<Dinosaur>();
-                            dino.herd.AddRange(me.herd);
-                            dino.herd.Add(gameObject);
-                            dino.setLeader(gameObject);
+                            me.herd.RemoveAll(item => item == null);
+                            // agregar a mi y mis dinos a manada externa
+                            foreach (GameObject dinoObject in newDino.herd)
+                            {
+                                if (dinoObject != null)
+                                {
+                                    Dinosaur dino = dinoObject.GetComponent<Dinosaur>();
+                                    dino.herd.AddRange(me.herd);
+                                    dino.herd.Add(gameObject);
+                                    dino.setLeader(gameObject);
+                                }
+                            }
                         }
+
                         List<GameObject> tempHerd = new List<GameObject>(me.herd);
                         
                         // agregar dinos externos a mi
