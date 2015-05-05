@@ -20,7 +20,7 @@ public class DinosaurReproduce : MonoBehaviour
             startElection();
     }
 
-<<<<<<< HEAD
+
     public void selectPartner()
     {
         posiblePartner.Clear();
@@ -87,73 +87,7 @@ public class DinosaurReproduce : MonoBehaviour
 
     private void mutation(float p)
     {
-=======
-	public void selectPartner()
-	{
-		posiblePartner.Clear ();
-		//Find the other in state of Reproduce
-		foreach (GameObject dino in gameObject.GetComponent<Dinosaur>().getHerd())
-		{
-			if (dino.GetComponent<Dinosaur>().state != Dinosaur.States.Die && dino.GetComponent<Dinosaur>().priority == Dinosaur.Priorities.Reproduce ) 
-			{
-				//If is female
-				if (dino !=null && !dino.GetComponent<Dinosaur>().female && dino.GetComponent<Dinosaur>().repLapse<=0)
-				{
-					posiblePartner.Add(dino);
-				}
-				/*else
-				{
 
-					//If is a male
-					if (!GetComponent<Dinosaur>().female && dino.GetComponent<Dinosaur>().female && dino.GetComponent<DinosaurReproduce>().partner == null)
-					{
-						posiblePartner.Add(dino);
-					}
-				}*/ 	
-			}
-		}
-		
-		//Debug.Log(posiblePartner.Count);
-		if (posiblePartner.Count >= 1)
-		{
-			int num = random.Next(0, posiblePartner.Count);
-			partner= posiblePartner[num];
-			
-		}
-		else {
-			partner = null;
-		}
-		
-		
-		if (partner != null)
-		{
-			//say
-			partner.SendMessage("letsMakeAChild",gameObject);
-			gameObject.GetComponent<Dinosaur>().repLapse=60;
-		}
-	}
-		
-	public void Reproduce(){
-		startReproduction();
-		unbecomeReproduce();
-		partner = null;
-	}
-		/**
-     * Consegui ser pareja, crea la luz encima de el
-     **/
-		private void startReproduction()
-		{
-			
-			if (GetComponent<Dinosaur>().female)
-			{
-				crossover(GetComponent<Dinosaur>().crossover);
-				mutation(GetComponent<Dinosaur>().mutation);
-			}
-		}
-		
-		private void mutation(float p)
-    { 
->>>>>>> 6f42574bcef7fad535a6b626a0ee42d5cbefcba1
         //Genotipe Uniform
 
 
@@ -175,11 +109,6 @@ public class DinosaurReproduce : MonoBehaviour
             child.GetComponent<Dinosaur>().stamina = random.Next(100, 110);
         }
 
-        //Tiempo de vida
-        if (generateRandom() < p)
-        {
-            child.GetComponent<Dinosaur>().lifetime = random.Next(540, 720);
-        }
 
         //Daño que realiza la entidad
         if (generateRandom() < p)
@@ -236,43 +165,49 @@ public class DinosaurReproduce : MonoBehaviour
 
 
         child = (GameObject)Instantiate(Resources.LoadAssetAtPath(path, typeof(GameObject)), partner.GetComponent<Rigidbody>().position, Quaternion.identity);
-        child.name = GetComponent<Dinosaur>().name;
+        var dinoChild = child.GetComponent<Dinosaur>();
+        var mama = GetComponent<Dinosaur>();
+
+
+        child.name = mama.name;
         child.transform.parent = transform.parent;
-        child.GetComponent<Dinosaur>().transform.localScale = new Vector3((float)(0.5 * child.GetComponent<Dinosaur>().transform.localScale.x),
-                                                                           (float)(0.5 * child.GetComponent<Dinosaur>().transform.localScale.y),
-                                                                            (float)(0.5 * child.GetComponent<Dinosaur>().transform.localScale.z));
+        dinoChild.transform.localScale = new Vector3((float)(0.5 * dinoChild.transform.localScale.x),
+                                                                           (float)(0.5 * dinoChild.transform.localScale.y),
+                                                                            (float)(0.5 * dinoChild.transform.localScale.z));
 
         //Recombination Floating-Point Arithmetic Recombination
 
         //Salud de la entidad
-        child.GetComponent<Dinosaur>().hp = (a * GetComponent<Dinosaur>().hp) + ((1 - a) * partner.GetComponent<Dinosaur>().hp);
+        dinoChild.hp = (a * GetComponent<Dinosaur>().hp) + ((1 - a) * partner.GetComponent<Dinosaur>().hp);
 
         //Velocidad de la entidad
-        child.GetComponent<Dinosaur>().speed = (int)((a * GetComponent<Dinosaur>().speed) + ((1 - a) * partner.GetComponent<Dinosaur>().speed));
+        dinoChild.speed = (int)((a * GetComponent<Dinosaur>().speed) + ((1 - a) * partner.GetComponent<Dinosaur>().speed));
 
         //Rango de comunicacion
-        child.GetComponent<Dinosaur>().comRange = (int)((a * GetComponent<Dinosaur>().comRange) + ((1 - a) * partner.GetComponent<Dinosaur>().comRange));
+        dinoChild.comRange = (int)((a * GetComponent<Dinosaur>().comRange) + ((1 - a) * partner.GetComponent<Dinosaur>().comRange));
 
         //Resistencia (nesesaria para correr etc....)
-        child.GetComponent<Dinosaur>().stamina = (a * GetComponent<Dinosaur>().stamina) + ((1 - a) * partner.GetComponent<Dinosaur>().stamina);
+        dinoChild.stamina = (a * GetComponent<Dinosaur>().stamina) + ((1 - a) * partner.GetComponent<Dinosaur>().stamina);
 
         //Tiempo de vida
-        child.GetComponent<Dinosaur>().lifetime = (a * GetComponent<Dinosaur>().lifetime) + ((1 - a) * partner.GetComponent<Dinosaur>().lifetime);
+        dinoChild.lifetime = 0;
 
         //Daño que realiza la entidad
-        child.GetComponent<Dinosaur>().attack = (a * GetComponent<Dinosaur>().attack) + ((1 - a) * partner.GetComponent<Dinosaur>().attack);
+        dinoChild.attack = (a * GetComponent<Dinosaur>().attack) + ((1 - a) * partner.GetComponent<Dinosaur>().attack);
 
         //Defense
-        child.GetComponent<Dinosaur>().defense = (a * GetComponent<Dinosaur>().defense) + ((1 - a) * partner.GetComponent<Dinosaur>().defense);
+        dinoChild.defense = (a * GetComponent<Dinosaur>().defense) + ((1 - a) * partner.GetComponent<Dinosaur>().defense);
+
+        //child.GetComponent<Dinosaur>().lifetime =  
 
         //Female
         if (random.Next(0, 100) < 50)
         {
-            child.GetComponent<Dinosaur>().female = true;
+            dinoChild.female = true;
         }
         else
         {
-            child.GetComponent<Dinosaur>().female = false;
+            dinoChild.female = false;
         }
 
         //La energia de la mama decremente despues de dar a luz
@@ -283,11 +218,11 @@ public class DinosaurReproduce : MonoBehaviour
         List<GameObject> childHerd = new List<GameObject>(momHerd);
 
         //Agregar al hijo la manada de la madre
-        child.GetComponent<Dinosaur>().herd = childHerd;
-        child.GetComponent<Dinosaur>().herd.Add(gameObject);
+        dinoChild.herd = childHerd;
+        dinoChild.herd.Add(gameObject);
 
 
-        // Agrega al hijo a la cada miembro de la manada
+        // Agrega al hijo a  cada miembro de la manada
         foreach (GameObject o in momHerd)
         {
             o.GetComponent<Dinosaur>().herd.Add(child);
@@ -298,10 +233,10 @@ public class DinosaurReproduce : MonoBehaviour
 
 
         //Si el hijo es mejor que el lider actual
-        if (child.GetComponent<Dinosaur>().getLeadershipStat() > GetComponent<Dinosaur>().getLeader().GetComponent<Dinosaur>().getLeadershipStat())
+        if (dinoChild.getLeadershipStat() > GetComponent<Dinosaur>().getLeader().GetComponent<Dinosaur>().getLeadershipStat())
         {
             //Soy mi propio lider y destrono al anterior
-            child.GetComponent<Dinosaur>().setLeader(child);
+            dinoChild.setLeader(child);
             GetComponent<Dinosaur>().getLeader().GetComponent<LeaderChoosing>().unbecomeLeader();
             child.GetComponent<LeaderChoosing>().becomeLeader();
 
@@ -315,7 +250,7 @@ public class DinosaurReproduce : MonoBehaviour
         }
         else
         {
-            child.GetComponent<Dinosaur>().setLeader(GetComponent<Dinosaur>().getLeader());
+            dinoChild.setLeader(GetComponent<Dinosaur>().getLeader());
         }
 
 

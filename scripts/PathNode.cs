@@ -158,7 +158,7 @@ public class PathNode : MonoBehaviour {
 	private void plantTree(){
 		Vector3 randPos = randomPosition();
 
-        int num = Random.Range(0, plants.Length-1); ;
+        int num = Random.Range(0, plants.Length); ;
         string plant = plants[num];
 
 
